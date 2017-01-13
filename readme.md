@@ -1,7 +1,5 @@
 #IoT Brew Fridge
 
-![Fridge](images/found-fridge.jpg)
-
 ## Goal
 
 Build an IoT brewing setup as cheaply as possible using [serverless computing](https://en.wikipedia.org/wiki/Serverless_computing).
@@ -20,6 +18,6 @@ Raspberry Pi acts as IoT device running the [AWS IoT Node.js library](https://gi
 
 ## Schematic
 
-![Fridge](images/schematic.png)
+![Schematic](images/schematic.png)
 
-
+![Fridge](images/found-fridge.jpg)
