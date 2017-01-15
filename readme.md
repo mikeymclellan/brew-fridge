@@ -22,7 +22,8 @@ Raspberry Pi acts as IoT device running the [AWS IoT Node.js library](https://gi
 
 ## References
 
-[Quick start using 1-wire temp sensors](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing/ds18b20)
+- [Quick start using 1-wire temp sensors](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing/ds18b20)
+- [Node.js GPIO](https://www.sitepoint.com/getting-started-with-the-raspberry-pi-gpio-pins-in-node-js/)
 
 
 ![Fridge](images/found-fridge.jpg)
