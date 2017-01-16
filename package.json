@@ -1,0 +1,22 @@
+{
+  "name": "brew-fridge",
+  "version": "0.0.0",
+  "description": "Brew Fridge ========================",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikeymclellan/brew-fridge.git"
+  },
+  "author": "Mikey McLellan",
+  "license": "NONE",
+  "bugs": {
+    "url": "https://github.com/mikeymclellan/brew-fridge/issues"
+  },
+  "homepage": "https://github.com/mikeymclellan/brew-fridge",
+  "dependencies": {
+    "onoff": "*"
+  }
+}
+
