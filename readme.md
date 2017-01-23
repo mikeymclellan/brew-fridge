@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build an IoT brewing setup as cheaply as possible using [serverless computing](https://en.wikipedia.org/wiki/Serverless_computing).
+Build an IoT brewing  as cheaply as possible using [serverless computing](https://en.wikipedia.org/wiki/Serverless_computing).
 
 ## Architecture
 
@@ -24,6 +24,7 @@ Raspberry Pi acts as IoT device running the [AWS IoT Node.js library](https://gi
 
 - [Quick start using 1-wire temp sensors](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing/ds18b20)
 - [Node.js GPIO](https://www.sitepoint.com/getting-started-with-the-raspberry-pi-gpio-pins-in-node-js/)
+- [AWS Serverless apps with Node.js](https://blog.fugue.co/2016-05-05-architecting-a-serverless-web-application-in-aws.html)
 
 
 ![Fridge](images/found-fridge.jpg)
