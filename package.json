@@ -2,7 +2,7 @@
   "name": "brew-fridge",
   "version": "0.0.0",
   "description": "Brew Fridge ========================",
-  "main": "index.js",
+  "main": "daemon/brew-fridge.js",
   "scripts": {
   },
   "repository": {
@@ -16,7 +16,9 @@
   },
   "homepage": "https://github.com/mikeymclellan/brew-fridge",
   "dependencies": {
-    "onoff": "*"
+    "onoff": "*",
+    "ds18b20": "*",
+    "dateformat": "*"
   }
 }
 
