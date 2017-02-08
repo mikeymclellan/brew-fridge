@@ -16,7 +16,7 @@ function Datastore(config) {
 }
 
 Datastore.EVENT_TABLE_NAME = 'Event';
-Datastore.TYPE_TEMPERATURE_READING = 'temperature_reading';
+Datastore.TYPE_TEMPERATURE_CHANGE = 'temperature_reading';
 Datastore.TYPE_RELAY_STATUS_CHANGE = 'relay_status_change';
 
 Datastore.prototype.createEventTable = function createEventTable() {
