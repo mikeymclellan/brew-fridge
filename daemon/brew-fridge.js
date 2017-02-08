@@ -1,6 +1,7 @@
 var dateFormat = require('dateformat');
 var onoff = require('onoff');
 var ds18b20 = require('ds18b20');
+var dynamodb = require('./dynamo-db');
 
 var daemon = this,
     temperatureSensorId,
@@ -9,33 +10,6 @@ var daemon = this,
 daemon.config = require('./config')();
 
 relay = new onoff.Gpio(daemon.config.relayGpio, 'out');
-
-function controlRelay(state)
-{
-    var currentState = relay.readSync();
-
-    if (state == 'on') {
-        if (currentState == daemon.config.relayActiveValue) {
-            console.log('Leaving relay on');
-        } else {
-            relay.write(daemon.config.relayActiveValue, function() {
-                console.log('Turning relay on');
-            });
-        }
-    }
-    else if (state == 'off') {
-        if (currentState != daemon.config.relayActiveValue) {
-            console.log('Leaving relay off');
-        } else {
-            relay.write(currentState+1%2, function() {
-                console.log('Turning relay off');
-            });
-        }
-    } else {
-	console.log('Unhandled state ' + state);
-        process.exit();
-    }
-}
 
 var temperatureCallback = function (err, value) {
 

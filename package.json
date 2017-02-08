@@ -18,7 +18,9 @@
   "dependencies": {
     "onoff": "*",
     "ds18b20": "*",
-    "dateformat": "*"
+    "dateformat": "*",
+    "aws-sdk": "*",
+    "uuid": "*"
   }
 }
 
