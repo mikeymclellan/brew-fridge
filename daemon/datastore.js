@@ -56,7 +56,7 @@ Datastore.prototype.putEvent = function putEvent(type, value) {
             "brewNodeUuid": this.config.brewNodeUuid,
             "type": type,
             "value": value,
-            "createdAt": new Date().getTime().toString()
+            "createdAt": new Date().toISOString()
         }
     };
 

@@ -1,7 +1,7 @@
 var dateFormat = require('dateformat');
 var onoff = require('onoff');
 var ds18b20 = require('ds18b20');
-var datastore = require('./dynamo-db');
+var datastore = require('./datastore');
 
 var daemon = this,
     temperatureSensorId,
