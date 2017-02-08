@@ -22,7 +22,7 @@ var temperatureCallback = function (err, value) {
     //console.log(now + ' Current temperature is', value);
 
     if (value != daemon.previousTemperatureReading) {
-        db.putEvent(db.TYPE_TEMPERATURE_CHANGE, value);
+        daemon.db.putEvent(daemon.db.TYPE_TEMPERATURE_CHANGE, value);
         daemon.previousTemperatureReading = value;
     }
 
@@ -36,7 +36,7 @@ var temperatureCallback = function (err, value) {
         } else {
             relay.write(daemon.config.relayActiveValue, function() {
                 console.log(now + ' Turning relay on. Temp is ' + value);
-                db.putEvent(db.TYPE_RELAY_STATUS_CHANGE, 1);
+                daemon.db.putEvent(daemon.db.TYPE_RELAY_STATUS_CHANGE, 1);
             });
         }
     } else if (currentState != daemon.config.relayActiveValue) {
@@ -46,7 +46,7 @@ var temperatureCallback = function (err, value) {
 
         relay.write(currentState+1%2, function() {
             console.log(now + ' Turning relay off. Temp is '+value);
-            db.putEvent(db.TYPE_RELAY_STATUS_CHANGE, 0);
+            daemon.db.putEvent(daemon.db.TYPE_RELAY_STATUS_CHANGE, 0);
         });
     } else {
         //console.log('Under temp but within hysteresis, leaving on');
@@ -54,6 +54,8 @@ var temperatureCallback = function (err, value) {
 
     ds18b20.temperature(temperatureSensorId, temperatureCallback);
 };
+
+daemon.db.putEvent(daemon.db.TYPE_INITIALISE, 1);
 
 ds18b20.sensors(function(err, ids) {
     console.log(ids);
