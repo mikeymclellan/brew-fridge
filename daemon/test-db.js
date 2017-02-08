@@ -6,4 +6,4 @@ var config = require('./config')();
 var db = new datastore(config);
 
 // db.createEventTable();
-db.putEvent(db.TYPE_TEMPERATURE_CHANGE, 2);
+db.putEvent(datastore.TYPE_TEST_EVENT, 2);

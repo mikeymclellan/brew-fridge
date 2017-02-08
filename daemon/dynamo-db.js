@@ -16,6 +16,7 @@ function Datastore(config) {
 }
 
 Datastore.EVENT_TABLE_NAME = 'Event';
+Datastore.TYPE_TEST_EVENT = 'test_event';
 Datastore.TYPE_INITIALISE = 'initialise';
 Datastore.TYPE_TEMPERATURE_CHANGE = 'temperature_reading';
 Datastore.TYPE_RELAY_STATUS_CHANGE = 'relay_status_change';
@@ -53,7 +54,7 @@ Datastore.prototype.putEvent = function putEvent(type, value) {
         Item: {
             "uuid":  uuid(),
             "brewNodeUuid": this.config.brewNodeUuid,
-            "eventType": type,
+            "type": type,
             "value": value,
             "createdAt": new Date().getTime().toString()
         }
@@ -62,8 +63,6 @@ Datastore.prototype.putEvent = function putEvent(type, value) {
     this.docClient.put(params, function(err, data) {
         if (err) {
             console.error("Unable to put event", params.Item.uuid, ". Error JSON:", JSON.stringify(err, null, 2));
-        } else {
-            console.log("Put event succeeded", params.Item.uuid);
         }
     });
 }
