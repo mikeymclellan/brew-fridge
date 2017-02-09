@@ -12,18 +12,19 @@ function BrewFridge(config) {
 
 BrewFridge.prototype.initialise = function BrewFridge_initialise(process)
 {
+    var self = this;
     this.relay = new onoff.Gpio(this.config.relayGpio, 'out');
 
     this.db.putEvent(datastore.TYPE_INITIALISE, 1);
 
     ds18b20.sensors(function(err, ids) {
         console.log(ids);
-        this.temperatureSensorId = ids[0];
-        ds18b20.temperature(this.temperatureSensorId, this.temperatureReadingCallback);
+        self.temperatureSensorId = ids[0];
+        ds18b20.temperature(self.temperatureSensorId, self.temperatureReadingCallback.bind(self));
     });
 
     process.on('SIGINT', function () {
-        this.shutdown();
+        self.shutdown();
         process.exit();
     });
 };
@@ -38,7 +39,7 @@ BrewFridge.prototype.shutdown = function BrewFridge_shutdown()
 
 BrewFridge.prototype.temperatureReadingCallback = function BrewFridge_temperatureReadingCallback(err, value) {
 
-    var that = this;
+    var self = this;
     var now = new Date();
     now = dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
 
@@ -47,7 +48,7 @@ BrewFridge.prototype.temperatureReadingCallback = function BrewFridge_temperatur
         this.previousTemperatureReading = value;
     }
 
-    var currentState = relay.readSync();
+    var currentState = this.relay.readSync();
 
     if (value > this.config.targetTemperature) {
         if (currentState == this.config.relayActiveValue) {
@@ -57,7 +58,7 @@ BrewFridge.prototype.temperatureReadingCallback = function BrewFridge_temperatur
         } else {
             this.relay.write(this.config.relayActiveValue, function() {
                 console.log(now + ' Turning relay on. Temp is ' + value);
-                that.db.putEvent(datastore.TYPE_RELAY_STATUS_CHANGE, 1);
+                self.db.putEvent(datastore.TYPE_RELAY_STATUS_CHANGE, 1);
             });
         }
     } else if (currentState != this.config.relayActiveValue) {
@@ -67,13 +68,13 @@ BrewFridge.prototype.temperatureReadingCallback = function BrewFridge_temperatur
 
         this.relay.write(currentState+1%2, function() {
             console.log(now + ' Turning relay off. Temp is '+value);
-            that.db.putEvent(datastore.TYPE_RELAY_STATUS_CHANGE, 0);
+            self.db.putEvent(datastore.TYPE_RELAY_STATUS_CHANGE, 0);
         });
     } else {
         //console.log('Under temp but within hysteresis, leaving on');
     }
 
-    ds18b20.temperature(this.temperatureSensorId, this.temperatureReadingCallback);
+    ds18b20.temperature(this.temperatureSensorId, this.temperatureReadingCallback.bind(self));
 };
 
 module.exports = BrewFridge;
