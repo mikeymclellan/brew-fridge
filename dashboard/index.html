@@ -22,16 +22,14 @@
             var docClient = new AWS.DynamoDB.DocumentClient();
 
             var brewNodeUuid = 'b1f85ed9-78a7-40e0-b695-be3c0fd8a95b';
-            var hoursBack = 24;
+            var hoursBack = 48;
 
             // Generating a string of the last X hours back
-            var ts = new Date().getTime();
-            var tsYesterday = (ts - (hoursBack * 3600) * 1000);
-            var d = new Date(tsYesterday);
-            var yesterdayDateString = d.getFullYear() + '-'
-                + ('0' + (d.getMonth()+1)).slice(-2) + '-'
-                + ('0' + d.getDate()).slice(-2) + 'T'
-                + ('0' + (d.getHours()+1)).slice(-2) + ':';
+            var d = new Date(new Date().getTime() - (hoursBack * 3600 * 1000));
+            var yesterdayDateString = d.getUTCFullYear() + '-'
+                + ('0' + (d.getUTCMonth()+1)).slice(-2) + '-'
+                + ('0' + d.getUTCDate()).slice(-2) + 'T'
+                + ('0' + (d.getUTCHours()+1)).slice(-2) + ':00:00+0000';
 
             // DynamoDB Query
             var params = {
@@ -41,7 +39,7 @@
                 ScanIndexForward: true,
                 ExpressionAttributeValues:{
                     ":brew_node_uuid": brewNodeUuid,
-                    ":start_date":yesterdayDateString,
+                    ":start_date":yesterdayDateString
                 },
                 KeyConditionExpression :
                     "brewNodeUuid = :brew_node_uuid AND createdAt >= :start_date"
@@ -56,7 +54,9 @@
                     var rows = [];
                     data.Items.forEach(function (item) {
                         var row = {};
-                        row.date = item.createdAt;
+                        var dt = new Date(item.createdAt);
+
+                        row.date = dt.toString().slice(0, -7);
                         row[item.type] = item.value;
                         rows.push(row);
                     });
@@ -66,7 +66,7 @@
 
                         data: {
                             x: 'date',
-                            xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+                            xFormat: '%a %b %d %Y %H:%M:%S GMT%Z',
                             json: rows,
                             keys: {
                                 x: 'date',
@@ -82,8 +82,9 @@
                         axis: {
                             x: {
                                 type: 'timeseries',
+                                localtime: true,
                                 tick: {
-                                    format: '%Y-%m-%d %I%p'
+                                    format: '%Y-%m-%d %I:%M%p'
                                 }
                             }
                         },
@@ -98,8 +99,6 @@
     </script>
 </head>
 <body>
-
-<div id="chart"></div>
-
+    <div id="chart"></div>
 </body>
 </html>
