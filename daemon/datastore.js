@@ -1,7 +1,6 @@
 const AWS = require("aws-sdk");
 const uuid = require('uuid/v4');
 
-
 function Datastore(config) {
     AWS.config.update({
         region: config.aws.region,
@@ -12,12 +11,12 @@ function Datastore(config) {
     this.config = config;
     this.dynamodb = new AWS.DynamoDB();
     this.docClient = new AWS.DynamoDB.DocumentClient();
-
 }
 
 Datastore.EVENT_TABLE_NAME = 'Event';
 Datastore.TYPE_TEST_EVENT = 'test_event';
 Datastore.TYPE_INITIALISE = 'initialise';
+Datastore.TYPE_SHUTDOWN = 'shutdown';
 Datastore.TYPE_TEMPERATURE_CHANGE = 'temperature_reading';
 Datastore.TYPE_RELAY_STATUS_CHANGE = 'relay_status_change';
 
@@ -25,12 +24,12 @@ Datastore.prototype.createEventTable = function createEventTable() {
     var params = {
         TableName : Datastore.EVENT_TABLE_NAME,
         KeySchema: [
-            { AttributeName: "uuid", KeyType: "HASH"},
-            { AttributeName: "brewNodeUuid", KeyType: "RANGE"}
+            { AttributeName: "brewNodeUuid", KeyType: "HASH"},
+            { AttributeName: "createdAt", KeyType: "RANGE"}
         ],
         AttributeDefinitions: [
-            { AttributeName: "uuid", AttributeType: "S" },
-            { AttributeName: "brewNodeUuid", AttributeType: "S" }
+            { AttributeName: "brewNodeUuid", AttributeType: "S" },
+            { AttributeName: "createdAt", AttributeType: "S" }
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 1,
