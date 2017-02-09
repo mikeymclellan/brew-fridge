@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Brew Fridge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.2.19.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript">
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'ap-southeast-2';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'ap-southeast-2:375b85ca-b8da-430b-b595-afd69d8297b4',
+        });
+
+        var docClient = new AWS.DynamoDB.DocumentClient();
+
+        var brewNodeUuid = 'b1f85ed9-78a7-40e0-b695-be3c0fd8a95b';
+        var hoursBack = 24;
+
+        // Generating a string of the last X hours back
+        var ts = new Date().getTime();
+        var tsYesterday = (ts - (hoursBack * 3600) * 1000);
+        var d = new Date(tsYesterday);
+        var yesterdayDateString = d.getFullYear() + '-'
+            + ('0' + (d.getMonth()+1)).slice(-2) + '-'
+            + ('0' + d.getDate()).slice(-2) + 'T'
+            + ('0' + (d.getHours()+1)).slice(-2) + ':';
+
+        // DynamoDB Query
+        var params = {
+            TableName: "Event",
+            Limit: 1000,
+            ConsistentRead: false,
+            ScanIndexForward: true,
+            ExpressionAttributeValues:{
+                ":brew_node_uuid": brewNodeUuid,
+                ":start_date":yesterdayDateString,
+            },
+            KeyConditionExpression :
+                "brewNodeUuid = :brew_node_uuid AND createdAt >= :start_date"
+        }
+
+        docClient.query(params, function(err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+            else{
+                document.write("<table style=\"width:100%\" class=\"pure-table\">\n");
+                document.write("<tr><th>Brew Node UUID</th><th>Event Type</th><th>Value</th><th>Timestamp</th></tr>");
+                data.Items.forEach(function(item) {
+                    document.write("<tr><td>", item.brewNodeUuid, '</td><td>', item.type,'</td><td>',item.value, '</td><td>', item.createdAt, '</td></tr>');
+                });
+                document.write("</table>");
+            }
+        });
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
