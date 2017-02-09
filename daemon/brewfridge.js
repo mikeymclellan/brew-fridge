@@ -10,6 +10,12 @@ function BrewFridge(config) {
     this.relay = null;
 }
 
+/**
+ * Temperature must change by at least this amount before it'll be logged
+ * @type {number}
+ */
+BrewFridge.TEMPERATURE_LOGGING_HYSTERESIS = 0.2;
+
 BrewFridge.prototype.initialise = function BrewFridge_initialise(process)
 {
     var self = this;
@@ -43,7 +49,7 @@ BrewFridge.prototype.temperatureReadingCallback = function BrewFridge_temperatur
     var now = new Date();
     now = dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
 
-    if (value != this.previousTemperatureReading) {
+    if (Math.abs(value - this.previousTemperatureReading) >= BrewFridge.TEMPERATURE_LOGGING_HYSTERESIS) {
         this.db.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, value);
         this.previousTemperatureReading = value;
     }
