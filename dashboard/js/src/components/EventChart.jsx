@@ -60,7 +60,7 @@ module.exports =
                             json: rows,
                             keys: {
                                 x: 'date',
-                                value: [ "temperature_reading", "relay_status_change" ]
+                                value: [ "temperature_reading", "cooling_relay_status_change", "heating_relay_status_change" ]
                             }
                         },
                         zoom: {

@@ -18,8 +18,8 @@ Datastore.TYPE_TEST_EVENT = 'test_event';
 Datastore.TYPE_INITIALISE = 'initialise';
 Datastore.TYPE_SHUTDOWN = 'shutdown';
 Datastore.TYPE_TEMPERATURE_CHANGE = 'temperature_reading';
-Datastore.TYPE_COOL_RELAY_STATUS_CHANGE = 'cool_relay_status_change';
-Datastore.TYPE_HEAT_RELAY_STATUS_CHANGE = 'heat_relay_status_change';
+Datastore.TYPE_COOLING_RELAY_STATUS_CHANGE = 'cooling_relay_status_change';
+Datastore.TYPE_HEATING_RELAY_STATUS_CHANGE = 'heating_relay_status_change';
 
 Datastore.prototype.createEventTable = function createEventTable() {
     var params = {
