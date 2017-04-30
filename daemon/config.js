@@ -1,11 +1,12 @@
 const minute = 60 * 1000;
 
 const config = {
-    targetTemperature: 23,
+    targetTemperature: 21,
     hysteresis: 0.25,
     sampleRate: minute, //sample rate in mS
     logRate: minute, //log rate in mS
-    relayGpio: 15,
+    heatRelayGpio: 2,
+    coolRelayGpio: 15,
     relayOnDelay: minute, //Wait time before turning relay on again from the last time it was turned on
     ds18b20Id: null, // leave null to auto-detect
     relayActiveValue: 0,  // 0 == active low
