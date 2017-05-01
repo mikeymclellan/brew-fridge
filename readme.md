@@ -20,6 +20,14 @@ Raspberry Pi acts as IoT device running the [AWS IoT Node.js library](https://gi
 
 ![Schematic](images/schematic.png)
 
+## Building
+
+    grunt webpack:prod
+    
+## Deploy
+
+    grunt deploy
+
 ## References
 
 - [Quick start using 1-wire temp sensors](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing/ds18b20)
