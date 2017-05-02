@@ -15,9 +15,9 @@ class TemperatureSetting extends React.Component {
         return (
             <div>
                 {this.props.temperature}&deg;
-                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon glyphicon-menu-up" aria-hidden="true"></span></button>
-                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon glyphicon-menu-down" aria-hidden="true"></span></button>
-                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon glyphicon-off" aria-hidden="true"></span></button>
+                <button type="button" className="btn btn-default"><span className="glyphicon glyphicon glyphicon-menu-up" aria-hidden="true"></span></button>
+                <button type="button" className="btn btn-default"><span className="glyphicon glyphicon glyphicon-menu-down" aria-hidden="true"></span></button>
+                <button type="button" className="btn btn-default"><span className="glyphicon glyphicon glyphicon-off" aria-hidden="true"></span></button>
             </div>
         );
     }

@@ -1,91 +1,144 @@
 var React = require('react');
 
-module.exports =
-    React.createClass({
-        render: function() {
-            // Initialize the Amazon Cognito credentials provider
-            AWS.config.region = 'ap-southeast-2';
-            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId: 'ap-southeast-2:375b85ca-b8da-430b-b595-afd69d8297b4',
-            });
+class EventChart extends React.Component {
 
-            var docClient = new AWS.DynamoDB.DocumentClient();
+    render()
+    {
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'ap-southeast-2';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'ap-southeast-2:375b85ca-b8da-430b-b595-afd69d8297b4',
+        });
 
-            var brewNodeUuid = 'b1f85ed9-78a7-40e0-b695-be3c0fd8a95b';
-            var hoursBack = 48;
+        var docClient = new AWS.DynamoDB.DocumentClient();
 
-            // Generating a string of the last X hours back
-            var d = new Date(new Date().getTime() - (hoursBack * 3600 * 1000));
-            var yesterdayDateString = d.getUTCFullYear() + '-'
-                + ('0' + (d.getUTCMonth()+1)).slice(-2) + '-'
-                + ('0' + d.getUTCDate()).slice(-2) + 'T'
-                + ('0' + (d.getUTCHours()+1)).slice(-2) + ':00:00+0000';
+        var brewNodeUuid = 'b1f85ed9-78a7-40e0-b695-be3c0fd8a95b';
+        var hoursBack = 96;
 
-            // DynamoDB Query
-            var params = {
-                TableName: "Event",
-                Limit: 50000,
-                ConsistentRead: false,
-                ScanIndexForward: true,
-                ExpressionAttributeValues:{
-                    ":brew_node_uuid": brewNodeUuid,
-                    ":start_date":yesterdayDateString
-                },
-                KeyConditionExpression :
-                    "brewNodeUuid = :brew_node_uuid AND createdAt >= :start_date"
+        // Generating a string of the last X hours back
+        var d = new Date(new Date().getTime() - (hoursBack * 3600 * 1000));
+        var yesterdayDateString = d.getUTCFullYear() + '-'
+            + ('0' + (d.getUTCMonth()+1)).slice(-2) + '-'
+            + ('0' + d.getUTCDate()).slice(-2) + 'T'
+            + ('0' + (d.getUTCHours()+1)).slice(-2) + ':00:00+0000';
+
+        // DynamoDB Query
+        var params = {
+            TableName: "Event",
+            Limit: 50000,
+            ConsistentRead: false,
+            ScanIndexForward: true,
+            ExpressionAttributeValues:{
+                ":brew_node_uuid": brewNodeUuid,
+                ":start_date":yesterdayDateString
+            },
+            KeyConditionExpression :
+                "brewNodeUuid = :brew_node_uuid AND createdAt >= :start_date"
+        };
+
+        var self = this;
+
+        docClient.query(params, function(err, data) {
+
+            if (err) {
+                console.log(err, err.stack);
+            } else {
+
+                var chart = c3.generate({
+                    bindto: '#chart',
+
+                    data: {
+                        x: 'date',
+                        xFormat: '%a %b %d %Y %H:%M:%S GMT%Z',
+                        json: self.formatRows(data.Items),
+                        keys: {
+                            x: 'date',
+                            value: [ "temperature_reading"]
+                        }
+                    },
+                    regions: self.formatRegions(data.Items),
+                    zoom: {
+                        enabled: true
+                    },
+                    point: {
+                        show: false
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            localtime: true,
+                            tick: {
+                                format: '%Y-%m-%d %I:%M%p'
+                            }
+                        }
+                    },
+                    line: {
+                        connectNull: true
+                    }
+                });
+            }
+        });
+        return (
+            <div id="chart"></div>
+        );
+    }
+
+    formatRegions(items)
+    {
+        var types = [];
+
+        items.forEach(function (item) {
+
+            if (item.type.indexOf('ing_relay_status_change') === -1) {
+                return;
             }
 
-            docClient.query(params, function(err, data) {
+            if (typeof types[item.type] === 'undefined') {
+                types[item.type] = [];
+            }
 
-                if (err) {
-                    console.log(err, err.stack);
-                } else {
+            if (item.value) {
+                types[item.type].push({start: new Date(item.createdAt), class: item.type});
+            } else {
+                // Get the previousRegion and set the end date
+                var previousRegion = types[item.type].pop();
 
-                    var rows = [];
-                    data.Items.forEach(function (item) {
-                        var row = {};
-                        var dt = new Date(item.createdAt);
-
-                        row.date = dt.toString().slice(0, -7);
-                        row[item.type] = item.value;
-                        rows.push(row);
-                    });
-
-                    var chart = c3.generate({
-                        bindto: '#chart',
-
-                        data: {
-                            x: 'date',
-                            xFormat: '%a %b %d %Y %H:%M:%S GMT%Z',
-                            json: rows,
-                            keys: {
-                                x: 'date',
-                                value: [ "temperature_reading", "cooling_relay_status_change", "heating_relay_status_change" ]
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        point: {
-                            show: false
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                localtime: true,
-                                tick: {
-                                    format: '%Y-%m-%d %I:%M%p'
-                                }
-                            }
-                        },
-                        line: {
-                            connectNull: true
-                        }
-                    });
+                if (typeof previousRegion === 'undefined') {
+                    // There is no previous 'on' state, assume is was just turned on and off.
+                    previousRegion = {class: item.type, start: new Date(item.createdAt)};
                 }
-            });
-            return (
-                <div id="chart"></div>
-            );
+                previousRegion.end = new Date(item.createdAt);
+                types[item.type].push(previousRegion);
+            }
+        });
+
+        var regions = [];
+
+        for (var type in types) {
+            regions = regions.concat(types[type]);
         }
-    });
+        return regions;
+    }
+
+    formatRows(items) {
+        var rows = [];
+
+        items.forEach(function (item) {
+
+            if (item.type.indexOf('ing_relay_status_change') !== -1) {
+                return;
+            }
+
+            var row = {};
+            var dt = new Date(item.createdAt);
+
+            row.date = dt.toString().slice(0, -7);
+            row[item.type] = item.value;
+            rows.push(row);
+        });
+
+        return rows;
+    }
+}
+
+module.exports = EventChart;

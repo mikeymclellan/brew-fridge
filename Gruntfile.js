@@ -24,10 +24,10 @@ module.exports = function(grunt) {
             production: {
                 options: {
                     bucket: 'brew-fridge.mclellan.org.nz',
-                    differential: true, // Only uploads the files that have changed
-                    params: {
-                        ContentEncoding: 'gzip' // applies to all the files!
-                    }
+                    differential: true // Only uploads the files that have changed
+                    // params: {
+                    //     ContentEncoding: 'gzip' // applies to all the files!
+                    // }
                 },
                 files: [
                     {expand: true, cwd: 'dashboard/js/build', src: ['**'], dest: 'js/build/'},

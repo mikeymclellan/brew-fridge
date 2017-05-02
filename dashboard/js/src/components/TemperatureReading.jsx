@@ -1,12 +1,13 @@
 var React = require('react');
 
-module.exports =
-    React.createClass({
-        render: function() {
-            return (
-                <div>
-                    {this.props.temperature}&deg;
-                </div>
-            );
-        }
-    });
+class TemperatureReading extends React.Component {
+    render()
+    {
+        return (
+            <div>
+                {this.props.temperature}&deg;
+            </div>
+        );
+    }
+}
+module.exports = TemperatureReading;
