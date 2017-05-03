@@ -12,12 +12,10 @@ module.exports = function(grunt) {
             prod: webpackConfig,
             dev: Object.assign({ watch: true }, webpackConfig)
         },
-        aws: grunt.file.readJSON('aws-keys.json'),
         aws_s3: {
             options: {
-                accessKeyId: '<%= aws.AWSAccessKeyId %>', // Use the variables
-                secretAccessKey: '<%= aws.AWSSecretKey %>', // You can also use env variables
                 region: 'ap-southeast-2',
+                awsProfile: 'mclellan',
                 uploadConcurrency: 5, // 5 simultaneous uploads
                 downloadConcurrency: 5 // 5 simultaneous downloads
             },
