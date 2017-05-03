@@ -1,7 +1,7 @@
 const minute = 60 * 1000;
 
 const config = {
-    targetTemperature: 21,
+    targetTemperature: 4,
     hysteresis: 0.25,
     sampleRate: minute, //sample rate in mS
     logRate: minute, //log rate in mS

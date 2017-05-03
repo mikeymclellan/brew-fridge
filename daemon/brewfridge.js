@@ -22,6 +22,8 @@ class BrewFridge {
         this.coolRelay = new onoff.Gpio(this.config.coolRelayGpio, 'out');
         this.heatRelay = new onoff.Gpio(this.config.heatRelayGpio, 'out');
 
+        this.setRelayState(this.coolRelay, false, false);
+        this.setRelayState(this.heatRelay, false, false);
         this.db.putEvent(datastore.TYPE_INITIALISE, 1);
 
         ds18b20.sensors(function(err, ids) {
@@ -39,9 +41,9 @@ class BrewFridge {
     shutdown()
     {
         this.db.putEvent(datastore.TYPE_SHUTDOWN, 1);
-        this.coolRelay.writeSync(this.config.relayActiveValue+1%2);
+        this.setRelayState(this.coolRelay, false, false);
+        this.setRelayState(this.heatRelay, false, false);
         this.coolRelay.unexport();
-        this.heatRelay.writeSync(this.config.relayActiveValue+1%2);
         this.heatRelay.unexport();
         console.log('Bye, bye!');
     }
@@ -49,35 +51,77 @@ class BrewFridge {
     getOnTemperature(circuit)
     {
         if (circuit === BrewFridge.CIRCUIT_COOLING) {
-            return this.config.targetTemperature + (this.getCoolHysteresis()/2) + this.getCoolHysteresis();
+            return this.config.targetTemperature + this.getHeatingCoolingTemperatureBuffer() + this.getCoolHysteresis();
         }
-        return (this.config.targetTemperature - (this.getHeatHysteresis()/2)) - this.getHeatHysteresis();
+        return (this.config.targetTemperature - this.getHeatingCoolingTemperatureBuffer()) - this.getHeatHysteresis();
     };
+
 
     getOffTemperature(heatOrCool)
     {
         if (heatOrCool === BrewFridge.CIRCUIT_COOLING) {
-            return (this.config.targetTemperature + (this.getCoolHysteresis()/2)) - this.getCoolHysteresis();
+            return (this.config.targetTemperature + this.getHeatingCoolingTemperatureBuffer()) - this.getCoolHysteresis();
         }
-        return (this.config.targetTemperature - (this.getHeatHysteresis()/2)) + this.getHeatHysteresis();
+        return (this.config.targetTemperature - this.getHeatingCoolingTemperatureBuffer()) + this.getHeatHysteresis();
     }
 
+    /**
+     * @todo Make adaptive
+     * @returns {number}
+     */
+    getHeatingCoolingTemperatureBuffer()
+    {
+        return this.config.hysteresis * 2;
+    }
+
+    /**
+     * @todo Make adaptive
+     * @returns {number}
+     */
     getCoolHysteresis()
     {
         return this.config.hysteresis;
     }
 
+    /**
+     * @todo Make adaptive
+     * @returns {number}
+     */
     getHeatHysteresis()
     {
         return this.config.hysteresis;
     }
 
-    logTemerature(currentTemperature)
+    logTemerature(currentTemperature, force = false)
     {
-        if (Math.abs(currentTemperature - this.previousTemperatureReading) >= BrewFridge.TEMPERATURE_LOGGING_HYSTERESIS) {
+        if (Math.abs(currentTemperature - this.previousTemperatureReading) >= BrewFridge.TEMPERATURE_LOGGING_HYSTERESIS || force) {
             this.db.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, currentTemperature);
             this.previousTemperatureReading = currentTemperature;
         }
+    }
+
+    setRelayState(relay, isActiveState, currentTemperature)
+    {
+        var self = this;
+        var now = new Date();
+        now = dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
+
+        var writeValue = isActiveState?this.config.relayActiveValue:this.config.relayActiveValue+1%2;
+
+        var eventType = relay === this.coolRelay?datastore.TYPE_COOLING_RELAY_STATUS_CHANGE:datastore.TYPE_HEATING_RELAY_STATUS_CHANGE;
+
+        relay.write(writeValue, function () {
+            console.log(now + ' ' + eventType + ' => ' + isActiveState + '. Temp is ' + currentTemperature);
+            self.db.putEvent(eventType, isActiveState);
+            if (currentTemperature !== false) {
+                self.db.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, currentTemperature);
+            }
+        });
+    }
+
+    isRelayOn(relay)
+    {
+        return relay.readSync() === this.config.relayActiveValue;
     }
 
     temperatureReadingCallback(err, currentTemperature)
@@ -91,53 +135,28 @@ class BrewFridge {
 
     controlCooling(currentTemperature)
     {
-        var self = this;
-        var now = new Date();
-        now = dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
+        var isCooling = this.isRelayOn(this.coolRelay);
 
-        var coolCurrentState = this.coolRelay.readSync();
-
-        if (currentTemperature > this.getOnTemperature(BrewFridge.CIRCUIT_COOLING)
-            && coolCurrentState != this.config.relayActiveValue)
+        if (currentTemperature > this.getOnTemperature(BrewFridge.CIRCUIT_COOLING) && !isCooling)
         {
-            this.coolRelay.write(this.config.relayActiveValue, function () {
-                console.log(now + ' Turning cooling relay on. Temp is ' + currentTemperature);
-                self.db.putEvent(datastore.TYPE_COOLING_RELAY_STATUS_CHANGE, 1);
-            });
+            this.setRelayState(this.coolRelay, true, currentTemperature);
         }
-        else if (currentTemperature < this.getOffTemperature(BrewFridge.CIRCUIT_COOLING)
-            && coolCurrentState === this.config.relayActiveValue)
+        else if (currentTemperature < this.getOffTemperature(BrewFridge.CIRCUIT_COOLING) && isCooling)
         {
-            this.coolRelay.write(coolCurrentState+1%2, function() {
-                console.log(now + ' Turning cooling relay off. Temp is '+currentTemperature);
-                self.db.putEvent(datastore.TYPE_COOLING_RELAY_STATUS_CHANGE, 0);
-            });
+            this.setRelayState(this.coolRelay, false, currentTemperature);
         }
     }
 
     controlHeating(currentTemperature)
     {
-        var self = this;
-        var now = new Date();
-        now = dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
+        var isHeating = this.isRelayOn(this.heatRelay);
 
-        var heatCurrentState = this.heatRelay.readSync();
-
-        if (currentTemperature < this.getOnTemperature(BrewFridge.CIRCUIT_HEATING)) {
-            if (heatCurrentState != this.config.relayActiveValue) {
-                this.heatRelay.write(this.config.relayActiveValue, function() {
-                    console.log(now + ' Turning heating relay on. Temp is ' + currentTemperature);
-                    self.db.putEvent(datastore.TYPE_HEATING_RELAY_STATUS_CHANGE, 1);
-                });
-            }
+        if (currentTemperature < this.getOnTemperature(BrewFridge.CIRCUIT_HEATING) && !isHeating) {
+            this.setRelayState(this.heatRelay, true, currentTemperature);
         }
-        else if (currentTemperature > this.getOffTemperature(BrewFridge.CIRCUIT_HEATING)
-            && heatCurrentState === this.config.relayActiveValue)
+        else if (currentTemperature > this.getOffTemperature(BrewFridge.CIRCUIT_HEATING) && isHeating)
         {
-            this.heatRelay.write(heatCurrentState+1%2, function() {
-                console.log(now + ' Turning heating relay off. Temp is '+currentTemperature);
-                self.db.putEvent(datastore.TYPE_HEATING_RELAY_STATUS_CHANGE, 0);
-            });
+            this.setRelayState(this.heatRelay, false, currentTemperature);
         }
     }
 }
