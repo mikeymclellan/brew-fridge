@@ -98,6 +98,19 @@ class EventChart extends React.Component {
             }
 
             if (item.value) {
+                // Get the previousRegion and check it's ended correctly
+                var previousRegion = types[item.type].pop();
+
+                if (typeof previousRegion !== 'undefined') {
+                    if (typeof previousRegion.end === 'undefined' && typeof previousRegion.start !== 'undefined') {
+                        // The previousRegion hasn't ended for some reason, let's just end it now
+                        previousRegion.end = new Date(item.createdAt);
+                    }
+
+                    // Put the previous regoin back
+                    types[item.type].push(previousRegion);
+                }
+
                 types[item.type].push({start: new Date(item.createdAt), class: item.type});
             } else {
                 // Get the previousRegion and set the end date
