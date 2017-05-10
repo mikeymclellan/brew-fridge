@@ -3,7 +3,8 @@
 var dateFormat = require('dateformat');
 var onoff = require('onoff');
 var ds18b20 = require('ds18b20');
-var datastore = require('./datastore');
+var datastore = require('./datastore.js');
+var fetch = require('node-fetch');
 
 class BrewFridge {
 
@@ -14,6 +15,7 @@ class BrewFridge {
         this.previousTemperatureReading = null;
         this.coolRelay = null;
         this.heatRelay = null;
+        this.fetchNodeSettings();
     }
 
     initialise(process)
@@ -92,7 +94,7 @@ class BrewFridge {
         return this.config.hysteresis;
     }
 
-    logTemerature(currentTemperature, force = false)
+    logTemperature(currentTemperature, force = false)
     {
         if (Math.abs(currentTemperature - this.previousTemperatureReading) >= BrewFridge.TEMPERATURE_LOGGING_HYSTERESIS || force) {
             this.db.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, currentTemperature);
@@ -126,7 +128,7 @@ class BrewFridge {
 
     temperatureReadingCallback(err, currentTemperature)
     {
-        this.logTemerature(currentTemperature);
+        this.logTemperature(currentTemperature);
         this.controlCooling(currentTemperature);
         this.controlHeating(currentTemperature);
 
@@ -158,6 +160,23 @@ class BrewFridge {
         {
             this.setRelayState(this.heatRelay, false, currentTemperature);
         }
+    }
+
+    fetchNodeSettings()
+    {
+        fetch(this.config.lambdaBaseUrl + '/node/' + this.config.brewNodeUuid)
+            .then((response) => {
+            return response.json();
+        })
+        .then((json) => {
+            this.config.targetTemperature = json.node.settings.targetTemperature;
+            console.log('fetch node data', json)
+        })
+        .catch((exception) => {
+            console.log('parsing failed', exception)
+        });
+
+        setTimeout(() => {this.fetchNodeSettings()}, 30000);
     }
 }
 

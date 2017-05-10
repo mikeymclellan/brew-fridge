@@ -1,7 +1,7 @@
 const minute = 60 * 1000;
 
 const config = {
-    targetTemperature: 4,
+    targetTemperature: 21,
     hysteresis: 0.25,
     sampleRate: minute, //sample rate in mS
     logRate: minute, //log rate in mS
@@ -11,6 +11,7 @@ const config = {
     ds18b20Id: null, // leave null to auto-detect
     relayActiveValue: 0,  // 0 == active low
     brewNodeUuid: 'b1f85ed9-78a7-40e0-b695-be3c0fd8a95b',
+    lambdaBaseUrl: 'https://4vcq2plqwd.execute-api.ap-southeast-2.amazonaws.com/dev',
     aws: {
         region: 'ap-southeast-2',
         key:    null, // Only used if set, otherwise will pull from aws credentials files

@@ -1,5 +1,6 @@
 module.exports = {
-    entry: ['./dashboard/js/src/main.jsx',
+    entry: ['whatwg-fetch', // https://github.com/github/fetch
+        './dashboard/js/src/main.jsx',
         './dashboard/css/main.less']
         ,
     output: {
