@@ -15,9 +15,9 @@ class TemperatureSetting extends React.Component {
         return (
             <div>
                 {this.state.temperature}&deg;
-                <button type="button" className="btn btn-default" onClick={() => this.incrementTemperature()}><span className="glyphicon glyphicon glyphicon-menu-up" aria-hidden="true"></span></button>
-                <button type="button" className="btn btn-default" onClick={() => this.decrementTemperature()}><span className="glyphicon glyphicon glyphicon-menu-down" aria-hidden="true"></span></button>
-                <button type="button" className="btn btn-default" onClick={() => this.turnOff()}><span className="glyphicon glyphicon glyphicon-off" aria-hidden="true"></span></button>
+                <button type="button" className="btn btn-default" onClick={() => this.incrementTemperature()}><i className="material-icons">keyboard_arrow_up</i></button>
+                <button type="button" className="btn btn-default" onClick={() => this.decrementTemperature()}><i className="material-icons">keyboard_arrow_down</i></button>
+                <button type="button" className="btn btn-default" onClick={() => this.turnOff()}><i className="material-icons">power_settings_new</i></button>
             </div>
         );
     }

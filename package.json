@@ -16,32 +16,35 @@
   "homepage": "https://github.com/mikeymclellan/brew-fridge",
   "dependencies": {
     "aws-sdk": "*",
-    "babel": "*",
-    "babel-core": "*",
-    "babel-loader": "*",
-    "babel-preset-es2015": "*",
-    "babel-preset-react": "*",
-    "backbone": "*",
     "dateformat": "*",
     "ds18b20": "*",
-    "jquery": "*",
+    "jquery": "^3.2.1",
+    "node-fetch": "*",
     "onoff": "*",
-    "react": "*",
-    "react-dom": "*",
     "uuid": "*",
-    "webpack": "*",
-    "node-fetch": "*"
-
+    "webpack": "*"
   },
   "devDependencies": {
     "autoprefixer-loader": "^3.2.0",
     "css-loader": "^0.28.0",
+    "file-loader": "^0.11.1",
     "grunt": "^1.0.1",
     "grunt-aws-s3": "^0.14.5",
     "grunt-webpack": "^2.0.1",
     "less": "^2.7.2",
     "less-loader": "^4.0.3",
     "style-loader": "^0.17.0",
-    "webpack": "^2.4.1"
+    "url-loader": "^0.5.8",
+    "webpack": "^2.4.1",
+    "bootstrap": "^3.3.7",
+    "bootstrap-material-design": "^0.5.10",
+    "babel": "*",
+    "babel-core": "*",
+    "babel-loader": "*",
+    "babel-preset-es2015": "*",
+    "babel-preset-react": "*",
+    "backbone": "*",
+    "react": "*",
+    "react-dom": "*"
   }
 }

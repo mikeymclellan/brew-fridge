@@ -1,10 +1,12 @@
+var webpack = require('webpack');
+
 module.exports = {
     entry: ['whatwg-fetch', // https://github.com/github/fetch
-        './dashboard/js/src/main.jsx',
-        './dashboard/css/main.less']
+        './dashboard/src/js/main.jsx',
+        './dashboard/src/css/main.less']
         ,
     output: {
-        filename: './dashboard/js/build/main.js'
+        filename: './dashboard/build/js/[name].js'
     },
     module: {
         loaders: [
@@ -17,12 +19,25 @@ module.exports = {
                 }
             },
             {
-                test: /\.less$/,
+                test: /\.less$|\.css$/,
                 loader: "style-loader!css-loader!autoprefixer-loader!less-loader"
+            },
+            {
+                test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)(\?.*)?$/i,
+                loader:'file-loader',
+                options: {
+                    name: 'dashboard/build/assets/[name].[hash].[ext]'
+                }
             }
         ]
     },
     resolve: {
         extensions: ['.js', '.jsx', '.json']
-    }
+    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        })
+    ]
 };
