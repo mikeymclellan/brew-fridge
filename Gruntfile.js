@@ -12,6 +12,18 @@ module.exports = function(grunt) {
             prod: webpackConfig,
             dev: Object.assign({ watch: true }, webpackConfig)
         },
+
+        "webpack-dev-server": {
+            options: {
+                webpack: webpackConfig,
+                publicPath: "/" + webpackConfig.output.publicPath
+            },
+            start: {
+                webpack: {
+                    devtool: "eval"
+                }
+            }
+        },
         aws_s3: {
             options: {
                 region: 'ap-southeast-2',
@@ -41,4 +53,5 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('default', ['webpack:prod']);
     grunt.registerTask('deploy', ['webpack:prod', 'aws_s3:production']);
+    grunt.registerTask('dev', ['webpack-dev-server']);
 };

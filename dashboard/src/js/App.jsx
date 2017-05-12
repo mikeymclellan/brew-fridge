@@ -48,9 +48,11 @@ class App extends React.Component {
             return (
                 <div>
                     <EventChart />
-                    <TemperatureReading temperature={this.props.nodeData.currentTemperature}/>
-                    <TemperatureSetting temperature={this.state.node.settings.targetTemperature}
-                                        brewNodeUuid={this.props.brewNodeUuid} baseUrl={this.props.baseUrl}/>
+                    <div className="well">
+                        <TemperatureReading temperature={this.props.nodeData.currentTemperature}/>
+                        <TemperatureSetting temperature={this.state.node.settings.targetTemperature}
+                                            brewNodeUuid={this.props.brewNodeUuid} baseUrl={this.props.baseUrl}/>
+                    </div>
                 </div>
             );
         }

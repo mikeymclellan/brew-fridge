@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "description": "Brew Fridge ========================",
   "main": "daemon/brew-fridge.js",
-  "scripts": {},
+  "scripts": {
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mikeymclellan/brew-fridge.git"
@@ -26,6 +27,14 @@
   },
   "devDependencies": {
     "autoprefixer-loader": "^3.2.0",
+    "babel": "*",
+    "babel-core": "*",
+    "babel-loader": "*",
+    "babel-preset-es2015": "*",
+    "babel-preset-react": "*",
+    "backbone": "*",
+    "bootstrap": "^3.3.7",
+    "bootstrap-material-design": "^0.5.10",
     "css-loader": "^0.28.0",
     "file-loader": "^0.11.1",
     "grunt": "^1.0.1",
@@ -33,18 +42,11 @@
     "grunt-webpack": "^2.0.1",
     "less": "^2.7.2",
     "less-loader": "^4.0.3",
+    "react": "*",
+    "react-dom": "*",
     "style-loader": "^0.17.0",
     "url-loader": "^0.5.8",
     "webpack": "^2.4.1",
-    "bootstrap": "^3.3.7",
-    "bootstrap-material-design": "^0.5.10",
-    "babel": "*",
-    "babel-core": "*",
-    "babel-loader": "*",
-    "babel-preset-es2015": "*",
-    "babel-preset-react": "*",
-    "backbone": "*",
-    "react": "*",
-    "react-dom": "*"
+    "webpack-dev-server": "^2.4.5"
   }
 }
