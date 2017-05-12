@@ -1,9 +1,5 @@
 .idea
 .DS_Store
-node_modules
-dashboard/js/build
-aws-keys.json
-
 
 # package directories
 node_modules
@@ -11,3 +7,6 @@ jspm_packages
 
 # Serverless directories
 .serverless
+
+# Build files
+dashboard/build
