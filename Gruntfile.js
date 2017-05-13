@@ -13,15 +13,12 @@ module.exports = function(grunt) {
             dev: Object.assign({ watch: true }, webpackConfig)
         },
 
+        // For some reason this isn't quite working properly. It starts the dev server but the browser doesn't dynamically update
         "webpack-dev-server": {
             options: {
-                webpack: webpackConfig,
-                publicPath: "/" + webpackConfig.output.publicPath
+                webpack: webpackConfig
             },
             start: {
-                webpack: {
-                    devtool: "eval"
-                }
             }
         },
         aws_s3: {

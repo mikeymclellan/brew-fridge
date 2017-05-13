@@ -49,9 +49,22 @@ class App extends React.Component {
                 <div>
                     <EventChart />
                     <div className="well">
-                        <TemperatureReading temperature={this.props.nodeData.currentTemperature}/>
-                        <TemperatureSetting temperature={this.state.node.settings.targetTemperature}
-                                            brewNodeUuid={this.props.brewNodeUuid} baseUrl={this.props.baseUrl}/>
+                        <fieldset>
+                            <div className="form-group">
+                                <label for="inputPassword" className="col-md-2 control-label">Current Temperature</label>
+                                <div className="col-md-10">
+                                    <TemperatureReading temperature={this.props.nodeData.currentTemperature}/>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label for="inputPassword" className="col-md-2 control-label">Target Temperature</label>
+                                <div className="col-md-10">
+                                    <TemperatureSetting temperature={this.state.node.settings.targetTemperature}
+                                                        brewNodeUuid={this.props.brewNodeUuid} baseUrl={this.props.baseUrl}/>
+                                </div>
+                            </div>
+
+                        </fieldset>
                     </div>
                 </div>
             );

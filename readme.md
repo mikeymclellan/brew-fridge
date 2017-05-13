@@ -24,7 +24,7 @@ Raspberry Pi acts as IoT device running the [AWS IoT Node.js library](https://gi
 
 You can use the webpack development server by running:
 
-    grunt dev
+    node_modules/.bin/webpack-dev-server --open
     
 ## Deploy
 

@@ -1,4 +1,6 @@
 var webpack = require('webpack');
+var path = require('path');
+
 
 module.exports = {
     entry: ['whatwg-fetch', // https://github.com/github/fetch
@@ -6,7 +8,13 @@ module.exports = {
         './dashboard/src/css/main.less']
         ,
     output: {
-        filename: './dashboard/build/js/[name].js'
+        path: path.resolve(__dirname, 'dashboard/build/js/'),
+        filename: '[name].js',
+        publicPath: 'build/js/'
+
+    },
+    devServer:{
+        contentBase: 'dashboard'
     },
     module: {
         loaders: [
