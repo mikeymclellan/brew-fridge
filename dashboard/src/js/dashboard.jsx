@@ -1,12 +1,6 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var router = new (require('./router.js')());
-var $ = require('jquery');
-require('bootstrap');
-require('bootstrap/dist/css/bootstrap.css');
-require('bootstrap-material-design');
-require('bootstrap-material-design/dist/css/bootstrap-material-design.css');
 
 var nodeData = {
     currentTemperature: 4.3,
@@ -15,10 +9,8 @@ var nodeData = {
 };
 
 var App = React.createFactory(require('./App.jsx'));
-ReactDOM.render(<App router={router}
-                     nodeData={nodeData}
+ReactDOM.render(<App nodeData={nodeData}
                      brewNodeUuid="b1f85ed9-78a7-40e0-b695-be3c0fd8a95b"
                      baseUrl="https://4vcq2plqwd.execute-api.ap-southeast-2.amazonaws.com/dev"
 />, document.getElementById('app'));
 
-$.material.init();

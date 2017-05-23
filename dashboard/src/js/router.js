@@ -7,9 +7,14 @@ module.exports = function(/*module dependencies*/) {
         },
         routes: {
             // create any routes required and handle with this.select function
-            "home": "foo"
+            "": "dashboard",
+            "login": "login"
         },
-        foo: function() {
+        dashboard: function() {
+            require('./dashboard.jsx');
+        },
+        login: function() {
+            console.log('login');
             // do something with Backbone.history.fragment value
         }
     });

@@ -29,6 +29,9 @@ You can use the webpack development server by running:
 ## Deploy
 
     grunt deploy
+    
+## Deploy Lambda
+    serverless deploy
 
 ## References
 

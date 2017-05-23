@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "description": "Brew Fridge ========================",
   "main": "daemon/brew-fridge.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/mikeymclellan/brew-fridge.git"
@@ -43,6 +42,7 @@
     "less": "^2.7.2",
     "less-loader": "^4.0.3",
     "react": "*",
+    "react-bootstrap-slider": "^2.0.0",
     "react-dom": "*",
     "style-loader": "^0.17.0",
     "url-loader": "^0.5.8",

@@ -4,14 +4,13 @@ var path = require('path');
 
 module.exports = {
     entry: ['whatwg-fetch', // https://github.com/github/fetch
-        './dashboard/src/js/main.jsx',
+        './dashboard/src/js/index.js',
         './dashboard/src/css/main.less']
         ,
     output: {
         path: path.resolve(__dirname, 'dashboard/build/js/'),
         filename: '[name].js',
         publicPath: 'build/js/'
-
     },
     devServer:{
         contentBase: 'dashboard'
