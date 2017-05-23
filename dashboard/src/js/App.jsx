@@ -1,26 +1,24 @@
 var React = require('react');
-var EventChart = React.createFactory(require('./components/EventChart.jsx'));
-var TemperatureReading = React.createFactory(require('./components/TemperatureReading.jsx'));
-var TemperatureSetting = React.createFactory(require('./components/TemperatureSetting.jsx'));
+var NodeController = React.createFactory(require('./components/NodeController.jsx'));
+var Config = require('./config.json');
+import LoginButton from './components/LoginButton';
 
 class App extends React.Component {
 
     propTypes: {
         brewNodeUuid: React.PropTypes.string.isRequired,
         baseUrl: React.PropTypes.string.isRequired
-    }
+    };
 
     constructor(props) {
         super(props);
 
         this.state = {
-            node: null,
-            isLoading: true,
+            googleUser: null
         };
     }
 
     componentDidMount() {
-
         this.setState({isLoading: false});
 
         fetch(this.props.baseUrl + '/node/' + this.props.brewNodeUuid)
@@ -28,7 +26,6 @@ class App extends React.Component {
                 return response.json();
             })
             .then((json) => {
-                console.log('fetch node data', json)
                 this.setState({node: json.node
                     , isLoading: false
                 });
@@ -38,37 +35,42 @@ class App extends React.Component {
             });
     }
 
+    updateGoogleUser(googleUser) {
+        this.setState({googleUser: googleUser});
+    }
+
     render() {
-
-        if (this.state.node === null) {
-            return (
-                <div>Loading...</div>
-            );
-        } else {
-            return (
-                <div>
-                    <EventChart />
-                    <div className="well">
-                        <fieldset>
-                            <div className="form-group">
-                                <label for="inputPassword" className="col-md-2 control-label">Current Temperature</label>
-                                <div className="col-md-10">
-                                    <TemperatureReading temperature={this.props.nodeData.currentTemperature}/>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label for="inputPassword" className="col-md-2 control-label">Target Temperature</label>
-                                <div className="col-md-10">
-                                    <TemperatureSetting temperature={this.state.node.settings.targetTemperature}
-                                                        brewNodeUuid={this.props.brewNodeUuid} baseUrl={this.props.baseUrl}/>
-                                </div>
-                            </div>
-
-                        </fieldset>
+        return (
+            <div>
+                <div className="navbar navbar-default">
+                    <div className="container-fluid">
+                        <div className="navbar-header">
+                            <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                                <span className="icon-bar"></span>
+                                <span className="icon-bar"></span>
+                                <span className="icon-bar"></span>
+                            </button>
+                            <a className="navbar-brand" href="javascript:void(0)">Brew Fridge</a>
+                        </div>
+                        <div className="navbar-collapse collapse navbar-responsive-collapse">
+                            <ul className="nav navbar-nav navbar-right">
+                                <LoginButton googleClientId={Config.google.clientId} updateUserCallback={(googleUser) => {this.updateGoogleUser(googleUser)}}/>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            );
-        }
+
+                <div className="container-fluid">
+                    <div className="row">
+                        {this.state.googleUser
+                            && this.state.googleUser.isSignedIn()
+                            && this.state.googleUser.getBasicProfile().getEmail() === 'mikey@mclellan.org.nz' &&
+                                <NodeController brewNodeUuid={this.props.brewNodeUuid} baseUrl={this.props.baseUrl}/>
+                        }
+                    </div>
+                </div>
+            </div>
+        );
     }
 }
 
