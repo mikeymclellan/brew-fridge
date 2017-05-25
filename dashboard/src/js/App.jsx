@@ -1,13 +1,13 @@
-var React = require('react');
+import React, { PropTypes, Component } from 'react';
 var NodeController = React.createFactory(require('./components/NodeController.jsx'));
 var Config = require('./config.json');
 import LoginButton from './components/LoginButton';
 
-class App extends React.Component {
+class App extends Component {
 
     propTypes: {
-        brewNodeUuid: React.PropTypes.string.isRequired,
-        baseUrl: React.PropTypes.string.isRequired
+        brewNodeUuid: PropTypes.string.isRequired,
+        baseUrl: PropTypes.string.isRequired
     };
 
     constructor(props) {
@@ -65,7 +65,7 @@ class App extends React.Component {
                         {this.state.googleUser
                             && this.state.googleUser.isSignedIn()
                             && this.state.googleUser.getBasicProfile().getEmail() === 'mikey@mclellan.org.nz' &&
-                                <NodeController brewNodeUuid={this.props.brewNodeUuid} baseUrl={this.props.baseUrl}/>
+                                <NodeController brewNodeUuid={this.props.brewNodeUuid} googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
                         }
                     </div>
                 </div>
