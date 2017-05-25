@@ -136,7 +136,7 @@ functions:
 #       Value: "Some output value"
 resources:
   Resources:
-    DynamoDbTable:
+    NodeTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: Node
@@ -149,9 +149,28 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    EventTable:
+      Type: AWS::DynamoDB::Table
+      DependsOn: NodeTable
+      Properties:
+        TableName: Event
+        AttributeDefinitions:
+          - AttributeName: brewNodeUuid
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: brewNodeUuid
+            KeyType: HASH
+          - AttributeName: createdAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
     DynamoDBIamPolicy:
       Type: AWS::IAM::Policy
-      DependsOn: DynamoDbTable
+      DependsOn: EventTable
       Properties:
         PolicyName: lambda-dynamodb
         PolicyDocument:
@@ -162,6 +181,7 @@ resources:
                 - dynamodb:GetItem
                 - dynamodb:PutItem
                 - dynamodb:UpdateItem
-              Resource: arn:aws:dynamodb:*:*:table/Node
+                - dynamodb:DescribeTable
+              Resource: arn:aws:dynamodb:*:*:table/*
         Roles:
           - Ref: IamRoleLambdaExecution

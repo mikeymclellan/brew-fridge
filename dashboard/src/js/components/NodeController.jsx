@@ -4,6 +4,12 @@ var EventChart = React.createFactory(require('./EventChart.jsx'));
 
 class NodeController extends Component {
 
+    propTypes: {
+        brewNodeUuid: PropTypes.string.isRequired,
+        googleUser: PropTypes.object.isRequired,
+        baseUrl: PropTypes.string.isRequired
+    };
+
     constructor(props) {
         super(props);
 
@@ -41,7 +47,7 @@ class NodeController extends Component {
 
         return (
             <div className="well brew-node col-md-3">
-                <h1 className="current-temperature">21&deg;
+                <h1 className="current-temperature">{this.state.node.currentTemperature}&deg;
                     <button type="button" className="btn btn-default" onClick={() => this.turnOff()}><i className="material-icons">power_settings_new</i></button>
                 </h1>
                 <div className="target">Target {this.state.targetTemperature}&deg;</div>
@@ -72,7 +78,8 @@ class NodeController extends Component {
         fetch(this.props.baseUrl + '/node/' + this.props.brewNodeUuid + '/settings', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + this.props.googleUser.getAuthResponse().id_token
             },
             body: JSON.stringify(partialSettings)
         });

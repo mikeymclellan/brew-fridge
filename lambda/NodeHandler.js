@@ -2,8 +2,9 @@
 
 const AWS = require("aws-sdk");
 const uuid = require('uuid/v4');
-
-// var Datastore = require('../daemon/datastore.js');
+const Request = require('./lib/Request');
+const Responder = require('./lib/Responder');
+const Node = require('./model/Node');
 
 module.exports.put = (event, context, callback) => {
 
@@ -22,41 +23,25 @@ module.exports.put = (event, context, callback) => {
 
 module.exports.updateSettings = (event, context, callback) => {
 
-    var data = JSON.parse(event.body);
-    var docClient = new AWS.DynamoDB.DocumentClient();
-
-    var updateExpression = 'set ';
-    var expressionAttributes = {};
-
-    for (var field in data) {
-        updateExpression += 'settings.'+field+' = :'+field+',';
-        expressionAttributes[':'+field] = data[field];
-    }
-    updateExpression = updateExpression.slice(0, -1);
-
-    var params = {
-        TableName: 'Node',
-        Key: { uuid: event.pathParameters.uuid },
-        UpdateExpression: updateExpression,
-        ExpressionAttributeValues: expressionAttributes,
-        ReturnValues: 'UPDATED_NEW'
-    };
-
-    docClient.update(params, function(err, data) {
-        if (err) {
-            console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
-            callback(null, {
-                statusCode: 500,
-                body: JSON.stringify({ result: false })
-            });
+    Request.verifyUser(event, (error, user) => {
+        if (error) {
+            return Responder.respond(callback, error);
         }
-        callback(null, {
-            statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-                "Access-Control-Allow-Credentials": true // Required for cookies, authorization headers with HTTPS }
-            },
-            body: JSON.stringify({ result: true })
+
+        var data = JSON.parse(event.body);
+
+        Node.get({uuid: event.pathParameters.uuid}, (error, node) => {
+            if (error) {
+                return Responder.respond(callback, error);
+            }
+
+            if (node.get('userId') !== user.sub) {
+                return Responder.respond(callback, 'User not allowed, node: '+node.get('uuid')+', userid: '+user.sub, 403);
+            }
+
+            Node.update({uuid: node.get('uuid'), settings: data}, (error, node) => {
+                return Responder.respond(callback, error);
+            });
         });
     });
 };

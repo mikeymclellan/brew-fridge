@@ -18,6 +18,8 @@
     "aws-sdk": "*",
     "dateformat": "*",
     "ds18b20": "*",
+    "dynamodb": "^1.0.0",
+    "google-auth-library": "^0.10.0",
     "jquery": "^3.2.1",
     "node-fetch": "*",
     "onoff": "*",

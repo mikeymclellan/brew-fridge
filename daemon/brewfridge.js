@@ -11,7 +11,6 @@ class BrewFridge {
     constructor(config)
     {
         this.config = config;
-        this.db = new datastore(config);
         this.previousTemperatureReading = null;
         this.coolRelay = null;
         this.heatRelay = null;
@@ -26,7 +25,7 @@ class BrewFridge {
 
         this.setRelayState(this.coolRelay, false, false);
         this.setRelayState(this.heatRelay, false, false);
-        this.db.putEvent(datastore.TYPE_INITIALISE, 1);
+        this.putEvent(datastore.TYPE_INITIALISE, 1);
 
         ds18b20.sensors(function(err, ids) {
             console.log(ids);
@@ -42,7 +41,7 @@ class BrewFridge {
 
     shutdown()
     {
-        this.db.putEvent(datastore.TYPE_SHUTDOWN, 1);
+        this.putEvent(datastore.TYPE_SHUTDOWN, 1);
         this.setRelayState(this.coolRelay, false, false);
         this.setRelayState(this.heatRelay, false, false);
         this.coolRelay.unexport();
@@ -97,7 +96,7 @@ class BrewFridge {
     logTemperature(currentTemperature, force = false)
     {
         if (Math.abs(currentTemperature - this.previousTemperatureReading) >= BrewFridge.TEMPERATURE_LOGGING_HYSTERESIS || force) {
-            this.db.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, currentTemperature);
+            this.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, currentTemperature);
             this.previousTemperatureReading = currentTemperature;
         }
     }
@@ -114,9 +113,9 @@ class BrewFridge {
 
         relay.write(writeValue, function () {
             console.log(now + ' ' + eventType + ' => ' + isActiveState + '. Temp is ' + currentTemperature);
-            self.db.putEvent(eventType, isActiveState);
+            self.putEvent(eventType, isActiveState);
             if (currentTemperature !== false) {
-                self.db.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, currentTemperature);
+                self.putEvent(datastore.TYPE_TEMPERATURE_CHANGE, currentTemperature);
             }
         });
     }
@@ -177,6 +176,32 @@ class BrewFridge {
         });
 
         setTimeout(() => {this.fetchNodeSettings()}, 30000);
+    }
+
+    putEvent(type, value)
+    {
+        var data = {
+            brewNodeUuid: this.config.brewNodeUuid,
+            type: type,
+            value: value
+        };
+
+        fetch(this.config.lambdaBaseUrl + '/event/put', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then((response) => {
+            return response.json();
+        })
+        .then((json) => {
+            // console.log('putEvent: ' + json.result);
+        })
+        .catch((exception) => {
+            console.log('putEvent() failed', exception)
+        });
     }
 }
 
