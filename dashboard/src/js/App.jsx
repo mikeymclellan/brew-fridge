@@ -62,11 +62,8 @@ class App extends Component {
 
                 <div className="container-fluid">
                     <div className="row">
-                        {this.state.googleUser
-                            && this.state.googleUser.isSignedIn()
-                            && this.state.googleUser.getBasicProfile().getEmail() === 'mikey@mclellan.org.nz' &&
-                                <NodeController brewNodeUuid={this.props.brewNodeUuid} googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
-                        }
+                        <NodeController brewNodeUuid={this.props.brewNodeUuid} googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
+                        <NodeController brewNodeUuid="8ca5ca7e-7344-42d5-8b8c-004edc688d48" googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
                     </div>
                 </div>
             </div>

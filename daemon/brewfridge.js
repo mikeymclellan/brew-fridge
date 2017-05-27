@@ -8,28 +8,47 @@ var fetch = require('node-fetch');
 
 class BrewFridge {
 
-    constructor(config)
+    constructor()
     {
-        this.config = config;
+        this.config = null;
         this.previousTemperatureReading = null;
         this.coolRelay = null;
         this.heatRelay = null;
-        this.fetchNodeSettings();
     }
 
     initialise(process)
     {
         var self = this;
-        this.coolRelay = new onoff.Gpio(this.config.coolRelayGpio, 'out');
-        this.heatRelay = new onoff.Gpio(this.config.heatRelayGpio, 'out');
 
-        this.setRelayState(this.coolRelay, false, false);
-        this.setRelayState(this.heatRelay, false, false);
+        if (typeof process.argv[2] !== 'undefined') {
+            this.config = require(process.argv[2]);
+        } else {
+            this.config = require('./config');
+        }
+
+        if (this.config.coolRelayGpio) {
+            this.coolRelay = new onoff.Gpio(this.config.coolRelayGpio, 'out');
+            this.setRelayState(this.coolRelay, false, false);
+        }
+
+        if (this.config.heatRelayGpio) {
+            this.heatRelay = new onoff.Gpio(this.config.heatRelayGpio, 'out');
+            this.setRelayState(this.heatRelay, false, false);
+        }
+
         this.putEvent(datastore.TYPE_INITIALISE, 1);
+        this.fetchNodeSettings();
 
         ds18b20.sensors(function(err, ids) {
+            console.log('Found the following temperature sensors:');
             console.log(ids);
-            self.temperatureSensorId = ids[0];
+            if (self.config.temperatureSensorId) {
+                console.log('Using \''+self.config.temperatureSensorId+'\' from config');
+                self.temperatureSensorId = self.config.temperatureSensorId;
+            } else {
+                self.temperatureSensorId = ids[0];
+                console.log('Using \''+self.temperatureSensorId+'\'');
+            }
             ds18b20.temperature(self.temperatureSensorId, self.temperatureReadingCallback.bind(self));
         });
 
@@ -42,10 +61,14 @@ class BrewFridge {
     shutdown()
     {
         this.putEvent(datastore.TYPE_SHUTDOWN, 1);
-        this.setRelayState(this.coolRelay, false, false);
-        this.setRelayState(this.heatRelay, false, false);
-        this.coolRelay.unexport();
-        this.heatRelay.unexport();
+        if (this.coolRelay) {
+            this.setRelayState(this.coolRelay, false, false);
+            this.coolRelay.unexport();
+        }
+        if (this.heatRelay) {
+            this.setRelayState(this.heatRelay, false, false);
+            this.heatRelay.unexport();
+        }
         console.log('Bye, bye!');
     }
 
@@ -56,7 +79,6 @@ class BrewFridge {
         }
         return (this.config.targetTemperature - this.getHeatingCoolingTemperatureBuffer()) - this.getHeatHysteresis();
     };
-
 
     getOffTemperature(heatOrCool)
     {
@@ -136,6 +158,9 @@ class BrewFridge {
 
     controlCooling(currentTemperature)
     {
+        if (!this.coolRelay) {
+            return;
+        }
         var isCooling = this.isRelayOn(this.coolRelay);
 
         if (currentTemperature > this.getOnTemperature(BrewFridge.CIRCUIT_COOLING) && !isCooling)
@@ -150,6 +175,9 @@ class BrewFridge {
 
     controlHeating(currentTemperature)
     {
+        if (!this.heatRelay) {
+            return;
+        }
         var isHeating = this.isRelayOn(this.heatRelay);
 
         if (currentTemperature < this.getOnTemperature(BrewFridge.CIRCUIT_HEATING) && !isHeating) {

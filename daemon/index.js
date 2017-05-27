@@ -1,4 +1,4 @@
 var BrewFridge = require('./brewfridge');
 
-var daemon = new BrewFridge(require('./config')());
+var daemon = new BrewFridge();
 daemon.initialise(process);
