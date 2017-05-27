@@ -93,6 +93,13 @@ functions:
             path: node/{uuid}
             method: get
 
+  userGet:
+      handler: lambda/UserHandler.get
+      events:
+        - http:
+            path: user
+            method: get
+            cors: true
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -164,6 +171,20 @@ resources:
             KeyType: HASH
           - AttributeName: createdAt
             KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      DependsOn: NodeTable
+      Properties:
+        TableName: User
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

@@ -2,11 +2,11 @@ import React, { PropTypes, Component } from 'react';
 var NodeController = React.createFactory(require('./components/NodeController.jsx'));
 var Config = require('./config.json');
 import LoginButton from './components/LoginButton';
+import Api from './lib/Api';
 
 class App extends Component {
 
     propTypes: {
-        brewNodeUuid: PropTypes.string.isRequired,
         baseUrl: PropTypes.string.isRequired
     };
 
@@ -14,29 +14,21 @@ class App extends Component {
         super(props);
 
         this.state = {
-            googleUser: null
+            googleUser: null,
+            nodeUuids: []
         };
     }
 
     componentDidMount() {
         this.setState({isLoading: false});
-
-        fetch(this.props.baseUrl + '/node/' + this.props.brewNodeUuid)
-            .then((response) => {
-                return response.json();
-            })
-            .then((json) => {
-                this.setState({node: json.node
-                    , isLoading: false
-                });
-            })
-            .catch((exception) => {
-                console.log('parsing failed', exception)
-            });
     }
 
     updateGoogleUser(googleUser) {
         this.setState({googleUser: googleUser});
+        this.api = new Api(this.props.baseUrl, googleUser);
+        this.api.getUser((error, result) => {
+            this.setState({nodeUuids: result.user.nodeUuids});
+        });
     }
 
     render() {
@@ -62,8 +54,9 @@ class App extends Component {
 
                 <div className="container-fluid">
                     <div className="row">
-                        <NodeController brewNodeUuid={this.props.brewNodeUuid} googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
-                        <NodeController brewNodeUuid="8ca5ca7e-7344-42d5-8b8c-004edc688d48" googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
+                        {this.state.nodeUuids && this.state.nodeUuids.map((uuid) =>
+                            <NodeController key={uuid} brewNodeUuid={uuid} googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
+                        )}
                     </div>
                 </div>
             </div>
