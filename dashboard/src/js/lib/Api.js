@@ -37,6 +37,10 @@ class Api {
     getUser(callback) {
         return this.fetch('/user', callback);
     }
+
+    getNode(uuid, callback) {
+        return this.fetch('/node/' + uuid, callback);
+    }
 }
 
 module.exports = Api;

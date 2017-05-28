@@ -6,6 +6,7 @@ class NodeController extends Component {
 
     propTypes: {
         brewNodeUuid: PropTypes.string.isRequired,
+        api: PropTypes.object.isRequired,
         googleUser: PropTypes.object.isRequired,
         baseUrl: PropTypes.string.isRequired
     };
@@ -23,19 +24,16 @@ class NodeController extends Component {
 
     componentDidMount() {
 
-        fetch(this.props.baseUrl + '/node/' + this.props.brewNodeUuid)
-            .then((response) => {
-                return response.json();
-            })
-            .then((json) => {
-                this.setState({node: json.node
-                    , isLoading: false
-                    , targetTemperature: json.node.settings.targetTemperature
-                });
-            })
-            .catch((exception) => {
-                console.log('parsing failed', exception)
+        this.props.api.getNode(this.props.brewNodeUuid, (error, result) => {
+
+            if (error) {
+                return console.log('NodeController error: '+ error);
+            }
+            this.setState({node: result.node
+                , isLoading: false
+                , targetTemperature: result.node.settings.targetTemperature
             });
+        });
     }
 
     render() {

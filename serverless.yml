@@ -92,6 +92,7 @@ functions:
         - http:
             path: node/{uuid}
             method: get
+            cors: true
 
   userGet:
       handler: lambda/UserHandler.get

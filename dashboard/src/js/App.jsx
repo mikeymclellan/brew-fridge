@@ -55,7 +55,7 @@ class App extends Component {
                 <div className="container-fluid">
                     <div className="row">
                         {this.state.nodeUuids && this.state.nodeUuids.map((uuid) =>
-                            <NodeController key={uuid} brewNodeUuid={uuid} googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
+                            <NodeController key={uuid} brewNodeUuid={uuid} api={this.api} googleUser={this.state.googleUser} baseUrl={this.props.baseUrl}/>
                         )}
                     </div>
                 </div>
