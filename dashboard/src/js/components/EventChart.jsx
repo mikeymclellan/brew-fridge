@@ -12,8 +12,8 @@ class EventChart extends React.Component {
 
         var docClient = new AWS.DynamoDB.DocumentClient();
 
-        var brewNodeUuid = 'b1f85ed9-78a7-40e0-b695-be3c0fd8a95b';
-        var hoursBack = 96;
+        var brewNodeUuid = this.props.brewNodeUuid; // 'b1f85ed9-78a7-40e0-b695-be3c0fd8a95b';
+        var hoursBack = 24;
 
         // Generating a string of the last X hours back
         var d = new Date(new Date().getTime() - (hoursBack * 3600 * 1000));
@@ -45,7 +45,7 @@ class EventChart extends React.Component {
             } else {
 
                 var chart = c3.generate({
-                    bindto: '#chart',
+                    bindto: '#chart-'+self.props.brewNodeUuid,
 
                     data: {
                         x: 'date',
@@ -79,7 +79,7 @@ class EventChart extends React.Component {
             }
         });
         return (
-            <div id="chart"></div>
+            <div id={'chart-'+this.props.brewNodeUuid}></div>
         );
     }
 

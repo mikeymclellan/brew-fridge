@@ -58,7 +58,7 @@ class NodeController extends Component {
                     slideStop={(e) => {this.temperatureStopHandler(e)}}
                     tooltip="hide"
                 ></ReactBootstrapSlider>
-                <EventChart />
+                <EventChart brewNodeUuid={this.props.brewNodeUuid} />
             </div>
         );
     }
