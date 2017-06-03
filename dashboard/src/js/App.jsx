@@ -2,12 +2,12 @@ import React, { PropTypes, Component } from 'react';
 var NodeController = React.createFactory(require('./components/NodeController.jsx'));
 var Config = require('./config.json');
 import LoginButton from './components/LoginButton';
-import Api from './lib/Api';
+import Api from '../../../lib/Api';
 
 class App extends Component {
 
     propTypes: {
-        baseUrl: PropTypes.string.isRequired
+        baseUrl: PropTypes.string
     };
 
     constructor(props) {
@@ -25,7 +25,7 @@ class App extends Component {
 
     updateGoogleUser(googleUser) {
         this.setState({googleUser: googleUser});
-        this.api = new Api(this.props.baseUrl, googleUser);
+        this.api = new Api(googleUser.getAuthResponse().id_token, this.props.baseUrl);
         this.api.getUser((error, result) => {
             this.setState({nodeUuids: result.user.nodeUuids});
         });

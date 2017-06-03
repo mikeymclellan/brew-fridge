@@ -4,7 +4,8 @@ var dateFormat = require('dateformat');
 var onoff = require('onoff');
 var ds18b20 = require('ds18b20');
 var datastore = require('./datastore.js');
-var fetch = require('node-fetch');
+
+var Api = require('../lib/Api');
 
 class BrewFridge {
 
@@ -14,6 +15,7 @@ class BrewFridge {
         this.previousTemperatureReading = null;
         this.coolRelay = null;
         this.heatRelay = null;
+        this.DEFAULT_HYSTERESIS = 0.25;
     }
 
     initialise(process)
@@ -25,6 +27,8 @@ class BrewFridge {
         } else {
             this.config = require('./config');
         }
+
+        this.api = new Api(null, this.config.lambdaBaseUrl || null);
 
         if (this.config.coolRelayGpio) {
             this.coolRelay = new onoff.Gpio(this.config.coolRelayGpio, 'out');
@@ -94,7 +98,7 @@ class BrewFridge {
      */
     getHeatingCoolingTemperatureBuffer()
     {
-        return this.config.hysteresis * 2;
+        return this.getCoolHysteresis() * 2;
     }
 
     /**
@@ -103,7 +107,7 @@ class BrewFridge {
      */
     getCoolHysteresis()
     {
-        return this.config.hysteresis;
+        return this.config.hysteresis || this.DEFAULT_HYSTERESIS;
     }
 
     /**
@@ -112,7 +116,7 @@ class BrewFridge {
      */
     getHeatHysteresis()
     {
-        return this.config.hysteresis;
+        return this.config.hysteresis || this.DEFAULT_HYSTERESIS;
     }
 
     logTemperature(currentTemperature, force = false)
@@ -191,16 +195,11 @@ class BrewFridge {
 
     fetchNodeSettings()
     {
-        fetch(this.config.lambdaBaseUrl + '/node/' + this.config.brewNodeUuid)
-            .then((response) => {
-            return response.json();
-        })
-        .then((json) => {
-            this.config.targetTemperature = json.node.settings.targetTemperature;
-            console.log('fetch node data', json)
-        })
-        .catch((exception) => {
-            console.log('parsing failed', exception)
+        this.api.getNode(this.config.brewNodeUuid, (error, result) => {
+            if (error) {
+                return console.log('fetchNodeSettings error: ' + error);
+            }
+            this.config.targetTemperature = result.node.settings.targetTemperature;
         });
 
         setTimeout(() => {this.fetchNodeSettings()}, 30000);
@@ -208,27 +207,10 @@ class BrewFridge {
 
     putEvent(type, value)
     {
-        var data = {
-            brewNodeUuid: this.config.brewNodeUuid,
-            type: type,
-            value: value
-        };
-
-        fetch(this.config.lambdaBaseUrl + '/event/put', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then((response) => {
-            return response.json();
-        })
-        .then((json) => {
-            // console.log('putEvent: ' + json.result);
-        })
-        .catch((exception) => {
-            console.log('putEvent() failed', exception)
+        this.api.putEvent(this.config.brewNodeUuid, type, value, (error, result) => {
+            if (error) {
+                console.log('putEvent() failed', error);
+            }
         });
     }
 }
