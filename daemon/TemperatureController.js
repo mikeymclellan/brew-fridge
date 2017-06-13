@@ -1,7 +1,6 @@
 'use strict';
 
 var dateFormat = require('dateformat');
-var onoff = require('onoff');
 var ds18b20 = require('ds18b20');
 var datastore = require('./datastore.js');
 var Api = require('../lib/Api');
@@ -29,6 +28,7 @@ class TemperatureController {
         this.api              = config.api || null;
         this.hysteresis       = config.hysteresis || DEFAULT_HYSTERESIS;
         this.relayActiveValue = config.relayActiveValue || ACTIVE_LOW;
+        this.brewNodeUuid     = config.brewNodeUuid || null;
 
         this.initialiseTemperatureControlRelays();
     }
@@ -48,11 +48,13 @@ class TemperatureController {
     initialiseTemperatureControlRelays()
     {
         if (this.coolRelayGpio) {
+            const onoff = require('onoff');
             this.coolRelay = new onoff.Gpio(this.coolRelayGpio, 'out');
             this.setRelayState(this.coolRelay, false, false);
         }
 
         if (this.heatRelayGpio) {
+            const onoff = require('onoff');
             this.heatRelay = new onoff.Gpio(this.heatRelayGpio, 'out');
             this.setRelayState(this.heatRelay, false, false);
         }
@@ -101,6 +103,10 @@ class TemperatureController {
      */
     getCoolHysteresis()
     {
+        if (this.targetTemperature < 8) {
+            // Temporary hack to keep duty cycle sane at lower temps
+            return 0.7;
+        }
         return this.hysteresis;
     }
 
@@ -180,7 +186,7 @@ class TemperatureController {
 
     putEvent(type, value)
     {
-        this.api.putEvent(this.config.brewNodeUuid, type, value, (error, result) => {
+        this.api.putEvent(this.brewNodeUuid, type, value, (error, result) => {
             if (error) {
                 console.log('putEvent() failed', error);
             }

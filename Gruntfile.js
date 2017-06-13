@@ -41,14 +41,27 @@ module.exports = function(grunt) {
                     {expand: true, cwd: 'dashboard', src: ['**'], dest: '/'},
                 ]
             }
+        },
+        run: {
+            tests: {
+                cmd: 'npm',
+                args: [
+                    'test',
+                    '--',
+                    'daemon/tests'
+                ]
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-webpack');
     grunt.loadNpmTasks('grunt-aws-s3');
+    grunt.loadNpmTasks('grunt-run');
+
 
     // Default task(s).
     grunt.registerTask('default', ['webpack:prod']);
     grunt.registerTask('deploy', ['webpack:prod', 'aws_s3:production']);
     grunt.registerTask('dev', ['webpack-dev-server']);
+    grunt.registerTask('test', ['run:tests']);
 };

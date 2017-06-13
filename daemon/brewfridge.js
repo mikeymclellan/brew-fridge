@@ -4,7 +4,7 @@ var onoff = require('onoff');
 var ds18b20 = require('ds18b20');
 var datastore = require('./datastore.js');
 var Api = require('../lib/Api');
-const TemperatureController = require('TemperatureController');
+const TemperatureController = require('./TemperatureController');
 
 class BrewFridge {
 
@@ -27,6 +27,7 @@ class BrewFridge {
             coolRelayGpio: this.config.coolRelayGpio,
             heatRelayGpio: this.config.heatRelayGpio,
             relayActiveValue: this.config.relayActiveValue,
+            brewNodeUuid: this.config.brewNodeUuid,
             api: this.api});
 
         this.putEvent(datastore.TYPE_INITIALISE, 1);
