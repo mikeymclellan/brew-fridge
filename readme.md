@@ -18,7 +18,7 @@ The fridge will then detect your temperature sensors and register itself on [bre
     
 Open the URL in your browser and the new node will be added to your account and allow setting the temperature from any web browser.
 
-<img src="images/screenshot.png" alt="Drawing" style="width: 200px" />
+<img src="images/screenshot.png" alt="Drawing" width="200" style="width: 200px" />
 
 ## Wiring
 
