@@ -6,19 +6,15 @@ const Request = require('./lib/Request');
 const Responder = require('./lib/Responder');
 const Node = require('./model/Node');
 
-module.exports.put = (event, context, callback) => {
+module.exports.register = (event, context, callback) => {
 
-    var data = JSON.parse(event.body);
-    // var datastore = new Datastore();
-    //
-    // var node = datastore.put(Datastore.NODE_TABLE_NAME, data);
+    Node.create({}, {}, (err, item, response) => {
 
-    const response = {
-        statusCode: 200,
-        body: JSON.stringify({ result: true, node: node })
-    };
-
-    callback(null, response);
+        if (err) {
+            return Responder.respond(callback, 'Unable to register node:' + err);
+        }
+        return Responder.respond(callback, item);
+    });
 };
 
 module.exports.updateSettings = (event, context, callback) => {
@@ -55,6 +51,7 @@ module.exports.get = (event, context, callback) => {
         Key: { uuid: event.pathParameters.uuid }
     };
 
+    // TODO: update to use `Node` model
     docClient.get(params, function(err, data) {
         if (err) {
             console.error("Unable to fetch item. Error JSON:", JSON.stringify(err, null, 2));
@@ -63,6 +60,7 @@ module.exports.get = (event, context, callback) => {
                 body: JSON.stringify({ result: false })
             });
         }
+        // TODO: update to use `Responder`
         callback(null, {
             statusCode: 200,
             headers: {

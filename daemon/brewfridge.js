@@ -1,10 +1,13 @@
 'use strict';
 
-var onoff = require('onoff');
-var ds18b20 = require('ds18b20');
-var datastore = require('./datastore.js');
-var Api = require('../lib/Api');
+const ds18b20 = require('ds18b20');
+const datastore = require('./datastore.js');
+const Api = require('../lib/Api');
 const TemperatureController = require('./TemperatureController');
+const fs = require('fs');
+
+const DASHBOARD_URL = 'http://brewfridge.mclellan.org.nz/';
+const CONFIG_PATH = require('os').homedir()+'/.brewfridge';
 
 class BrewFridge {
 
@@ -19,33 +22,85 @@ class BrewFridge {
 
     initialise(process)
     {
-        this.loadConfig(process.argv);
+        this.loadConfig(process, (error) => {
+            if (error) {
+                process.exit(-1);
+            }
+            this.api = new Api(null, this.config.lambdaBaseUrl || null);
+            this.temperatureController = new TemperatureController({
+                coolRelayGpio: this.config.coolRelayGpio,
+                heatRelayGpio: this.config.heatRelayGpio,
+                relayActiveValue: this.config.relayActiveValue,
+                brewNodeUuid: this.config.brewNodeUuid,
+                api: this.api});
+            this.putEvent(datastore.TYPE_INITIALISE, 1);
+            this.fetchNodeSettings();
+            this.initialiseTemperatureSensors();
 
-        this.api = new Api(null, this.config.lambdaBaseUrl || null);
-
-        this.temperatureController = new TemperatureController({
-            coolRelayGpio: this.config.coolRelayGpio,
-            heatRelayGpio: this.config.heatRelayGpio,
-            relayActiveValue: this.config.relayActiveValue,
-            brewNodeUuid: this.config.brewNodeUuid,
-            api: this.api});
-
-        this.putEvent(datastore.TYPE_INITIALISE, 1);
-        this.fetchNodeSettings();
-        this.initialiseTemperatureSensors();
-
-        process.on('SIGINT', () => {
-            this.shutdown();
-            process.exit();
+            process.on('SIGINT', () => {
+                this.shutdown();
+                process.exit();
+            });
         });
     }
 
-    loadConfig(argv)
+    getDefaultConfig()
     {
-        if (typeof argv[2] !== 'undefined') {
-            this.config = require(process.argv[2]);
-        } else {
-            this.config = require('./config');
+        return {
+            targetTemperature: null,
+            heatRelayGpio: null,
+            coolRelayGpio: null,
+            relayActiveValue: 0,  // 0 == active low
+            brewNodeUuid: null,
+            temperatureSensorId: null
+        };
+    }
+
+    registerNewNode(callback)
+    {
+        this.api = new Api(); // Have to bootstrap the API without any config, will use defaults
+        this.api.registerNode((error, result) => {
+            if (error) {
+                console.log('registerNode() failed', error);
+                callback(error);
+            }
+            this.config = this.getDefaultConfig();
+            this.config.brewNodeUuid = result.uuid;
+
+            fs.mkdir(CONFIG_PATH, 0o755, (err) => {
+                if (err && err.code !== 'EEXIST') {
+                    console.log(err);
+                    return;
+                }
+                fs.writeFile(CONFIG_PATH+'/config.js', 'module.exports = ' + JSON.stringify(this.config)+';', (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log('Registered new node, go to '+DASHBOARD_URL+'/node/claim/'+result.uuid);
+                    callback(err, this.config);
+                });
+            });
+        });
+    }
+
+    loadConfig(process, callback)
+    {
+        if (typeof process.argv[2] !== 'undefined') {
+            try {
+                this.config = require(process.argv[2]);
+                callback();
+            } catch (e) {
+                console.log('Couldn\'t load config file ' + process.argv[2]);
+                callback(e.message);
+            }
+            return;
+        }
+        try {
+            this.config = require(CONFIG_PATH+'/config.js');
+            callback();
+        } catch (e) {
+            console.log('No config found, will register as a new node');
+            this.registerNewNode(callback);
         }
     }
 

@@ -71,12 +71,12 @@ functions:
             path: event/put
             method: put
 
-  putNode:
-      handler: lambda/NodeHandler.put
+  registerNode:
+      handler: lambda/NodeHandler.register
       events:
         - http:
-            path: node/put
-            method: put
+            path: node/register
+            method: get
 
   nodeUpdateSettings:
       handler: lambda/NodeHandler.updateSettings

@@ -1,7 +1,6 @@
 'use strict';
 
 var dateFormat = require('dateformat');
-var ds18b20 = require('ds18b20');
 var datastore = require('./datastore.js');
 var Api = require('../lib/Api');
 
