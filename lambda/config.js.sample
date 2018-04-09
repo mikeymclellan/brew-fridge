@@ -1,0 +1,12 @@
+/* Copy this file to `config.js` and fill in values for Google sign in API */
+
+module.exports = {
+    aws: {
+        region: 'ap-southeast-2',
+    },
+    google: {
+        info: "https://developers.google.com/identity/sign-in/web/devconsole-project",
+        clientId: "",
+        clientSecret: ""
+    }
+};

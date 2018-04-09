@@ -34,7 +34,7 @@ The only requirement is wiring up a temperature sensor, typically you'll also wi
 
 ## Developing
 
-The project has three components; the `daemon` which senses can controls the fridge temperature, the `dashboard` which is is the user interface to set the target temperature, and the `lambda` functions which define the JSON APIs the `daamon` and `dashboard` communicate with.
+The project has three components; the `daemon` which senses and controls the fridge temperature, the `dashboard` which is is the user interface to set the target temperature, and the `lambda` functions which define the JSON APIs the `daamon` and `dashboard` communicate with.
 
 You can use the webpack development server by running:
 
