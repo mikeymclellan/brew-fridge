@@ -5,6 +5,7 @@ const uuid = require('uuid/v4');
 const Request = require('./lib/Request');
 const Responder = require('./lib/Responder');
 const Node = require('./model/Node');
+const User = require('./model/User');
 
 module.exports.register = (event, context, callback) => {
 
@@ -16,6 +17,30 @@ module.exports.register = (event, context, callback) => {
         return Responder.respond(callback, item);
     });
 };
+
+module.exports.claim = (event, context, callback) => {
+
+    Request.verifyUser(event, (error, user) => {
+        if (error) {
+            return Responder.respond(callback, error);
+        }
+        Node.get({uuid: event.pathParameters.uuid}, (error, node) => {
+            if (error) {
+                return Responder.respond(callback, error);
+            }
+
+            if (node.get('userId') && node.get('userId') !== user.sub) {
+                return Responder.respond(callback, 'User not allowed, node: '+node.get('uuid')+', userid: '+user.sub, 403);
+            }
+
+            Node.update({uuid: node.get('uuid'), userId: user.sub}, (error, node) => {
+                User.update({id: user.sub, nodeUuids: {$add : [node.get('uuid')]} });
+                return Responder.respond(callback, node);
+            });
+        });
+    });
+};
+
 
 module.exports.updateSettings = (event, context, callback) => {
 

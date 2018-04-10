@@ -31,7 +31,7 @@ class NodeController extends Component {
             }
             this.setState({node: result.node
                 , isLoading: false
-                , targetTemperature: result.node.settings.targetTemperature
+                , targetTemperature: result.node.settings?result.node.settings.targetTemperature:null
             });
         });
     }
@@ -73,6 +73,7 @@ class NodeController extends Component {
     }
 
     nodeUpdateSettings(partialSettings) {
+        // TODO: Why is this not using the Api?
         fetch(this.props.baseUrl + '/node/' + this.props.brewNodeUuid + '/settings', {
             method: 'POST',
             headers: {

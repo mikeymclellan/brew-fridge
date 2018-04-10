@@ -76,7 +76,7 @@ class BrewFridge {
                     if (err) {
                         console.log(err);
                     }
-                    console.log('Registered new node, go to '+DASHBOARD_URL+'/node/claim/'+result.uuid);
+                    console.log('Registered new node, go to '+DASHBOARD_URL+'/claim/'+result.uuid);
                     callback(err, this.config);
                 });
             });

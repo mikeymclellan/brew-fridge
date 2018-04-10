@@ -78,6 +78,14 @@ functions:
             path: node/register
             method: get
 
+  claimNode:
+      handler: lambda/NodeHandler.claim
+      events:
+        - http:
+            path: node/claim/{uuid}
+            method: get
+            cors: true
+
   nodeUpdateSettings:
       handler: lambda/NodeHandler.updateSettings
       events:
