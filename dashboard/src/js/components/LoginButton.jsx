@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react';
 import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import Menu, { MenuItem } from 'material-ui/Menu';
+import Typography from 'material-ui/Typography';
 
 class LoginButton extends Component {
     propTypes: {
@@ -86,7 +87,9 @@ class LoginButton extends Component {
                         onClick= {(event) => { this.handleMenu(event) }}
                         color="inherit"
                     >
-                        <img src={userProfile.getImageUrl()} style={{borderRadius: '50%', width: '25px', marginRight: '5px'}}/>
+                        <Typography variant="body1" color="inherit">
+                            <img src={userProfile.getImageUrl()} style={{borderRadius: '50%', width: '25px', marginRight: '5px'}}/>
+                        </Typography>
                     </IconButton>
                     <Menu
                         id="menu-appbar"
@@ -101,7 +104,7 @@ class LoginButton extends Component {
                         }}
                         open={open}
 
-                        onClose={this.handleClose}
+                        onClose={() => {this.handleClose()}}
                     >
                         <MenuItem onClick={(event) => { this.handleButtonClick(event)}}>Sign Out</MenuItem>
                     </Menu>

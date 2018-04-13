@@ -57,13 +57,13 @@ class App extends Component {
 
         return (
             <BrowserRouter>
-                <div>
+                <div style={{flexGrow: 1}}>
                     <AppBar position="static">
                         <Toolbar>
                             <IconButton color="inherit" aria-label="Menu">
                                 <MenuIcon />
                             </IconButton>
-                            <Typography variant="title" color="inherit" >
+                            <Typography variant="title" color="inherit" style={{flex: 1}}>
                                 Brew Fridge
                             </Typography>
                             <LoginButton googleClientId={Config.google.clientId} updateUserCallback={(googleUser) => {this.updateGoogleUser(googleUser)}}/>
