@@ -1,5 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import NodeController from './NodeController.jsx'
+import Grid from 'material-ui/Grid';
+
 
 class NodeControllerList extends Component {
 
@@ -22,13 +24,13 @@ class NodeControllerList extends Component {
 
     render() {
         return (
-            <div className="container-fluid">
-                <div className="row">
-                    {this.props.nodeUuids && this.props.nodeUuids.map((uuid) =>
+            <Grid container spacing={16}>
+                {this.props.nodeUuids && this.props.nodeUuids.map((uuid) =>
+                    <Grid item key={'controller-'+uuid}>
                         <NodeController key={uuid} brewNodeUuid={uuid} api={this.props.api} googleUser={this.props.googleUser} baseUrl={this.props.baseUrl}/>
-                    )}
-                </div>
-            </div>
+                    </Grid>
+                )}
+            </Grid>
         );
     }
 }

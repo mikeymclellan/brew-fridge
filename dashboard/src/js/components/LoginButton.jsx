@@ -1,4 +1,7 @@
 import React, { PropTypes, Component } from 'react';
+import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
+import Menu, { MenuItem } from 'material-ui/Menu';
 
 class LoginButton extends Component {
     propTypes: {
@@ -8,12 +11,12 @@ class LoginButton extends Component {
 
     constructor(props) {
         super(props);
-
         this.auth = null;
         this.state = {
             googleUser: null,
             isDisabled: true,
-            isSignedIn: false
+            isSignedIn: false,
+            anchorEl: null
         };
     }
 
@@ -61,42 +64,54 @@ class LoginButton extends Component {
         this.auth.signIn();
     }
 
+    handleMenu(event) {
+        this.setState({ anchorEl: event.currentTarget });
+    }
+
+    handleClose() {
+        this.setState({ anchorEl: null });
+    };
+
     render() {
+        const {anchorEl} = this.state;
+        const open = Boolean(anchorEl);
         const userProfile = this.state.isSignedIn?this.state.googleUser.getBasicProfile():null;
 
-        // As a navbar dropdown
         if (this.state.isSignedIn) {
             return (
-                <li className="dropdown">
-                    <a href="javascript:void(0)" className="dropdown-toggle" data-toggle="dropdown">
+                <div>
+                    <IconButton
+                        aria-owns={open ? 'menu-appbar' : null}
+                        aria-haspopup="true"
+                        onClick= {(event) => { this.handleMenu(event) }}
+                        color="inherit"
+                    >
                         <img src={userProfile.getImageUrl()} style={{borderRadius: '50%', width: '25px', marginRight: '5px'}}/>
-                        {userProfile.getName()}
-                        <b className="caret"></b>
-                    </a>
-                    <ul className="dropdown-menu">
-                        <li><a href="javascript:void(0)" onClick={() => {
-                            this.handleButtonClick()
-                        }}>Sign Out</a></li>
-                    </ul>
-                </li>
+                    </IconButton>
+                    <Menu
+                        id="menu-appbar"
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={open}
+
+                        onClose={this.handleClose}
+                    >
+                        <MenuItem onClick={(event) => { this.handleButtonClick(event)}}>Sign Out</MenuItem>
+                    </Menu>
+                </div>
             );
         } else {
             return (
-                <li><a href="javascript:void(0)" onClick={() => { this.handleButtonClick() }}>Sign In</a></li>
+                <Button onClick={() => { this.handleButtonClick() }} color="inherit">Login</Button>
             );
         }
-
-        // Or as a button:
-        return (
-            <div>
-                <button type="button" disabled={this.state.isDisabled ? "disabled" : false} onClick={() => {this.handleButtonClick()}} className="btn btn-raised btn-default">
-                    {this.state.isSignedIn &&
-                        <img src={userProfile.getImageUrl()} style={{ borderRadius: '50%', width: '25px', marginRight: '5px'}} />
-                    }
-                    {this.state.isSignedIn ? userProfile.getName() : "Sign In"}
-                </button>
-            </div>
-        );
     }
 }
 

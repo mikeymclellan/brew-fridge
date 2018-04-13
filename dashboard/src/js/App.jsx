@@ -5,11 +5,16 @@ import Config from './config.json'
 import LoginButton from './components/LoginButton'
 import Claim from './components/Claim'
 import Api from '../../../lib/Api'
+import AppBar from 'material-ui/AppBar'
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import IconButton from 'material-ui/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
 
 class App extends Component {
 
     propTypes: {
-        baseUrl: PropTypes.string
+        baseUrl: PropTypes.string,
     };
 
     constructor(props) {
@@ -53,31 +58,27 @@ class App extends Component {
         return (
             <BrowserRouter>
                 <div>
-                    <div className="navbar navbar-default">
-                        <div className="container-fluid">
-                            <div className="navbar-header">
-                                <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                                    <span className="icon-bar"></span>
-                                    <span className="icon-bar"></span>
-                                    <span className="icon-bar"></span>
-                                </button>
-                                <a className="navbar-brand" href="javascript:void(0)">Brew Fridge</a>
-                            </div>
-                            <div className="navbar-collapse collapse navbar-responsive-collapse">
-                                <ul className="nav navbar-nav navbar-right">
-                                    <LoginButton googleClientId={Config.google.clientId} updateUserCallback={(googleUser) => {this.updateGoogleUser(googleUser)}}/>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <AppBar position="static">
+                        <Toolbar>
+                            <IconButton color="inherit" aria-label="Menu">
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography variant="title" color="inherit" >
+                                Brew Fridge
+                            </Typography>
+                            <LoginButton googleClientId={Config.google.clientId} updateUserCallback={(googleUser) => {this.updateGoogleUser(googleUser)}}/>
+                        </Toolbar>
+                    </AppBar>
+
                     <Link to='/claim/skjfghksg'>Claim</Link>
                     <Link to='/'>Home</Link>
                     <Route exact path="/" render={() => <NodeControllerList {...nodeListProps} /> }/>
                     <Route exact path="/claim/:uuid" render={(props) => <Claim {...props} {...claimProps} /> }/>
+                    <Claim api={this.api} googleUser={this.state.googleUser} />
                 </div>
             </BrowserRouter>
         );
     }
 }
 
-module.exports = App;
+export default App;

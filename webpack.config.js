@@ -3,6 +3,7 @@ var path = require('path');
 
 
 module.exports = {
+    mode: 'development',
     entry: ['whatwg-fetch', // https://github.com/github/fetch
         './dashboard/src/js/index.js',
         './dashboard/src/css/main.less']
@@ -16,7 +17,7 @@ module.exports = {
         contentBase: 'dashboard'
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /.jsx?$/,
                 loader: 'babel-loader',
@@ -27,7 +28,21 @@ module.exports = {
             },
             {
                 test: /\.less$|\.css$/,
-                loader: "style-loader!css-loader!autoprefixer-loader!less-loader"
+                use: [{
+                    loader: 'style-loader' // creates style nodes from JS strings
+                }, {
+                    loader: 'css-loader' // translates CSS into CommonJS
+                }, {
+                    loader: 'postcss-loader' // translates CSS into CommonJS
+                    ,
+                        options: {
+                            postcss: []}
+                }, {
+                    loader: 'less-loader', // compiles Less to CSS
+                    options: {
+                        strictMath: true
+                    }
+                }]
             },
             {
                 test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)(\?.*)?$/i,
@@ -44,7 +59,8 @@ module.exports = {
     plugins: [
         new webpack.ProvidePlugin({
             $: "jquery",
-            jQuery: "jquery"
+            jQuery: "jquery",
+            Popper: ['popper.js', 'default']
         })
     ]
 };

@@ -1,5 +1,12 @@
 import React, { PropTypes, Component } from 'react';
-import ReactBootstrapSlider from 'react-bootstrap-slider';
+import Card, { CardContent } from 'material-ui/Card';
+import Switch from 'material-ui/Switch';
+import Typography from 'material-ui/Typography';
+import Select from 'material-ui/Select';
+import Input, { InputLabel } from 'material-ui/Input';
+import { MenuItem } from 'material-ui/Menu';
+import { FormControl, FormHelperText } from 'material-ui/Form';
+
 var EventChart = React.createFactory(require('./EventChart.jsx'));
 
 class NodeController extends Component {
@@ -15,7 +22,7 @@ class NodeController extends Component {
         super(props);
 
         this.state = {
-            targetTemperature: null,
+            targetTemperature: 0,
             isEnabled: true,
             node: null,
             isLoading: true,
@@ -23,7 +30,6 @@ class NodeController extends Component {
     }
 
     componentDidMount() {
-
         this.props.api.getNode(this.props.brewNodeUuid, (error, result) => {
 
             if (error) {
@@ -31,7 +37,7 @@ class NodeController extends Component {
             }
             this.setState({node: result.node
                 , isLoading: false
-                , targetTemperature: result.node.settings?result.node.settings.targetTemperature:null
+                , targetTemperature: result.node.settings?result.node.settings.targetTemperature:0
             });
         });
     }
@@ -44,47 +50,88 @@ class NodeController extends Component {
         }
 
         return (
-            <div className="well brew-node col-md-3">
-                <h1 className="current-temperature">{this.state.node.currentTemperature}&deg;
-                    <button type="button" className="btn btn-default" onClick={() => this.turnOff()}><i className="material-icons">power_settings_new</i></button>
-                </h1>
-                <div className="target">Target {this.state.targetTemperature}&deg;</div>
-                <ReactBootstrapSlider
-                    className="slider"
-                    value={parseInt(this.state.targetTemperature)}
-                    min={0}
-                    max={30}
-                    change={(e) => {this.temperatureChangeHandler(e)}}
-                    slideStop={(e) => {this.temperatureStopHandler(e)}}
-                    tooltip="hide"
-                ></ReactBootstrapSlider>
-                <EventChart brewNodeUuid={this.props.brewNodeUuid} />
-            </div>
-        );
-    }
+            <Card style={{width:'350px'}}>
+                <CardContent>
+                    <Typography variant="display4">
+                        {this.state.node.currentTemperature}&deg;
+                        <Switch
+                            checked={this.state.isEnabled}
+                            onChange={(e) => {this.toggleEnabled(e)}}
+                            value="1"
+                        />
+                    </Typography>
 
-    temperatureStopHandler(event) {
-        this.setState({targetTemperature: event.target.value});
-        this.nodeUpdateSettings({targetTemperature: this.state.targetTemperature});
+                    <FormControl >
+                        <InputLabel htmlFor="age-simple">Target</InputLabel>
+                        <Select
+                            value={this.state.targetTemperature}
+                            onChange={(e) => {this.temperatureChangeHandler(e)}}
+                            inputProps={{
+                                name: 'targetTemperature',
+                                id: 'target-temperature',
+                            }}
+                        >
+                            <MenuItem value={30}>30&deg;</MenuItem>
+                            <MenuItem value={29}>29&deg;</MenuItem>
+                            <MenuItem value={28}>28&deg;</MenuItem>
+                            <MenuItem value={27}>27&deg;</MenuItem>
+                            <MenuItem value={26}>26&deg;</MenuItem>
+                            <MenuItem value={25}>25&deg;</MenuItem>
+                            <MenuItem value={24}>24&deg;</MenuItem>
+                            <MenuItem value={23}>23&deg;</MenuItem>
+                            <MenuItem value={22}>22&deg;</MenuItem>
+                            <MenuItem value={21}>21&deg;</MenuItem>
+                            <MenuItem value={20}>20&deg;</MenuItem>
+                            <MenuItem value={19}>19&deg;</MenuItem>
+                            <MenuItem value={18}>18&deg;</MenuItem>
+                            <MenuItem value={17}>17&deg;</MenuItem>
+                            <MenuItem value={16}>16&deg;</MenuItem>
+                            <MenuItem value={15}>15&deg;</MenuItem>
+                            <MenuItem value={14}>14&deg;</MenuItem>
+                            <MenuItem value={13}>13&deg;</MenuItem>
+                            <MenuItem value={12}>12&deg;</MenuItem>
+                            <MenuItem value={11}>11&deg;</MenuItem>
+                            <MenuItem value={10}>10&deg;</MenuItem>
+                            <MenuItem value={9}>9&deg;</MenuItem>
+                            <MenuItem value={8}>8&deg;</MenuItem>
+                            <MenuItem value={7}>7&deg;</MenuItem>
+                            <MenuItem value={6}>6&deg;</MenuItem>
+                            <MenuItem value={5}>5&deg;</MenuItem>
+                            <MenuItem value={4}>4&deg;</MenuItem>
+                            <MenuItem value={3}>3&deg;</MenuItem>
+                            <MenuItem value={2}>2&deg;</MenuItem>
+                            <MenuItem value={1}>1&deg;</MenuItem>
+                            <MenuItem value={-1}>-1&deg;</MenuItem>
+                            <MenuItem value={-2}>-2&deg;</MenuItem>
+                            <MenuItem value={-3}>-3&deg;</MenuItem>
+                            <MenuItem value={-4}>-4&deg;</MenuItem>
+                            <MenuItem value={-5}>-5&deg;</MenuItem>
+                            <MenuItem value={-6}>-6&deg;</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {/*<EventChart brewNodeUuid={this.props.brewNodeUuid} />*/}
+                </CardContent>
+            </Card>
+        );
     }
 
     temperatureChangeHandler(event) {
         this.setState({targetTemperature: event.target.value});
+        this.nodeUpdateSettings({targetTemperature: event.target.value});
     }
 
     nodeUpdateSettings(partialSettings) {
-        // TODO: Why is this not using the Api?
-        fetch(this.props.baseUrl + '/node/' + this.props.brewNodeUuid + '/settings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + this.props.googleUser.getAuthResponse().id_token
-            },
-            body: JSON.stringify(partialSettings)
+        this.props.api.updateNodeSettings(this.props.brewNodeUuid, partialSettings, (error, result) => {
+            if (error) {
+                console.log(error);
+                this.setState({error: error});
+            }
+            console.log(result);
         });
     }
 
-    turnOff() {
+    toggleEnabled() {
+        this.setState({isEnabled: !this.state.isEnabled});
     }
 }
 

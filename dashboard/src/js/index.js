@@ -1,13 +1,7 @@
-require('bootstrap');
-require('bootstrap/dist/css/bootstrap.css');
-require('bootstrap-material-design');
-require('bootstrap-material-design/dist/css/bootstrap-material-design.css');
-
 import React from 'react'
 import ReactDOM from 'react-dom'
+import App from './App'
 
-const App = React.createFactory(require('./App.jsx'));
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(<App baseUrl={'https://m6tkeez3mk.execute-api.ap-southeast-2.amazonaws.com/dev'}/>, document.getElementById('app'));
 
 const $ = jQuery = require('jquery');
-$.material.init();
