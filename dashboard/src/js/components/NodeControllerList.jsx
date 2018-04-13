@@ -24,9 +24,9 @@ class NodeControllerList extends Component {
 
     render() {
         return (
-            <Grid container spacing={16}>
+            <Grid container spacing={16} style={{flexGrow:1, margin: 0, paddingRight: '5px'}}>
                 {this.props.nodeUuids && this.props.nodeUuids.map((uuid) =>
-                    <Grid item key={'controller-'+uuid}>
+                    <Grid item key={'controller-'+uuid} xs={12} sm={4}>
                         <NodeController key={uuid} brewNodeUuid={uuid} api={this.props.api} googleUser={this.props.googleUser} baseUrl={this.props.baseUrl}/>
                     </Grid>
                 )}

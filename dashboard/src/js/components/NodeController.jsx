@@ -50,7 +50,7 @@ class NodeController extends Component {
         }
 
         return (
-            <Card style={{width:'350px'}}>
+            <Card style={{min____Width:'350px'}}>
                 <CardContent>
                     <Typography variant="display4">
                         {this.state.node.currentTemperature}&deg;
@@ -60,7 +60,6 @@ class NodeController extends Component {
                             value="1"
                         />
                     </Typography>
-
                     <FormControl >
                         <InputLabel htmlFor="age-simple">Target</InputLabel>
                         <Select

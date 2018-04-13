@@ -83,7 +83,7 @@ class App extends Component {
                                 open={Boolean(this.state.menuAnchorElement)}
                                 onClose={(e) => {this.handleMenuClose(e)}}
                             >
-                                <MenuItem onClick={(e) => {this.handleMenuClose(e)}}><Link to='/claim/skjfghksg'>Claim</Link></MenuItem>
+                                <MenuItem onClick={(e) => {this.handleMenuClose(e)}}><Link to='/claim'>Claim</Link></MenuItem>
                                 <MenuItem onClick={(e) => {this.handleMenuClose(e)}}><Link to='/'>Home</Link></MenuItem>
                             </Menu>
 
@@ -94,8 +94,7 @@ class App extends Component {
                         </Toolbar>
                     </AppBar>
                     <Route exact path="/" render={() => <NodeControllerList {...nodeListProps} /> }/>
-                    <Route exact path="/claim/:uuid" render={(props) => <Claim {...props} {...claimProps} /> }/>
-                    <Claim api={this.api} googleUser={this.state.googleUser} />
+                    <Route path="/claim/:uuid?" render={(props) => <Claim {...props} {...claimProps} /> }/>
                 </div>
             </BrowserRouter>
         );
