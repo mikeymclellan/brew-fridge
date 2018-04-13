@@ -10,6 +10,8 @@ import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import Menu, { MenuItem } from 'material-ui/Menu';
+
 
 class App extends Component {
 
@@ -22,7 +24,8 @@ class App extends Component {
 
         this.state = {
             googleUser: null,
-            nodeUuids: []
+            nodeUuids: [],
+            menuAnchorElement: null
         };
     }
 
@@ -39,6 +42,14 @@ class App extends Component {
             }
             this.setState({nodeUuids: result.user.nodeUuids});
         });
+    }
+
+    handleMenuOpen(event) {
+        this.setState({ menuAnchorElement: event.currentTarget });
+    }
+
+    handleMenuClose() {
+        this.setState({ menuAnchorElement: null });
     }
 
     render() {
@@ -60,18 +71,28 @@ class App extends Component {
                 <div style={{flexGrow: 1}}>
                     <AppBar position="static">
                         <Toolbar>
-                            <IconButton color="inherit" aria-label="Menu">
+                            <IconButton color="inherit" aria-label="Menu"
+                                        aria-owns={this.state.menuAnchorElement ? 'simple-menu' : null}
+                                        aria-haspopup="true"
+                                        onClick={(e) => {this.handleMenuOpen(e)}}>
                                 <MenuIcon />
                             </IconButton>
+                            <Menu
+                                id="simple-menu"
+                                anchorEl={this.state.menuAnchorElement}
+                                open={Boolean(this.state.menuAnchorElement)}
+                                onClose={(e) => {this.handleMenuClose(e)}}
+                            >
+                                <MenuItem onClick={(e) => {this.handleMenuClose(e)}}><Link to='/claim/skjfghksg'>Claim</Link></MenuItem>
+                                <MenuItem onClick={(e) => {this.handleMenuClose(e)}}><Link to='/'>Home</Link></MenuItem>
+                            </Menu>
+
                             <Typography variant="title" color="inherit" style={{flex: 1}}>
                                 Brew Fridge
                             </Typography>
                             <LoginButton googleClientId={Config.google.clientId} updateUserCallback={(googleUser) => {this.updateGoogleUser(googleUser)}}/>
                         </Toolbar>
                     </AppBar>
-
-                    <Link to='/claim/skjfghksg'>Claim</Link>
-                    <Link to='/'>Home</Link>
                     <Route exact path="/" render={() => <NodeControllerList {...nodeListProps} /> }/>
                     <Route exact path="/claim/:uuid" render={(props) => <Claim {...props} {...claimProps} /> }/>
                     <Claim api={this.api} googleUser={this.state.googleUser} />
