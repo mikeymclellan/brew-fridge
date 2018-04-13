@@ -1,0 +1,15 @@
+[Unit]
+Description = Brewfridge
+
+After = systemd-user-sessions.service network.target
+
+[Service]
+User = root
+Group = root
+Type = simple
+ExecStart = /usr/local/bin/node /home/mikey/brew-fridge/daemon/index.js
+Restart = on-abort
+RestartSec = 5
+
+[Install]
+WantedBy = multi-user.target
