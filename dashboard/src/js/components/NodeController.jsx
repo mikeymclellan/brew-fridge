@@ -54,11 +54,6 @@ class NodeController extends Component {
                 <CardContent>
                     <Typography variant="display4">
                         {this.state.node.currentTemperature}&deg;
-                        <Switch
-                            checked={this.state.isEnabled}
-                            onChange={(e) => {this.toggleEnabled(e)}}
-                            value="1"
-                        />
                     </Typography>
                     <FormControl >
                         <InputLabel htmlFor="age-simple">Target</InputLabel>
@@ -108,6 +103,11 @@ class NodeController extends Component {
                             <MenuItem value={-6}>-6&deg;</MenuItem>
                         </Select>
                     </FormControl>
+                    <Switch
+                        checked={this.state.isEnabled}
+                        onChange={(e) => {this.toggleEnabled(e)}}
+                        value="1"
+                    />
                     {/*<EventChart brewNodeUuid={this.props.brewNodeUuid} />*/}
                 </CardContent>
             </Card>

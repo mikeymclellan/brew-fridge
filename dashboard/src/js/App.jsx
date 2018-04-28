@@ -25,8 +25,15 @@ class App extends Component {
         this.state = {
             googleUser: null,
             nodeUuids: [],
-            menuAnchorElement: null
+            menuAnchorElement: null,
+            isLoading: true,
+            api: null
         };
+    }
+
+    componentWillUnmount()
+    {
+        this.setState({isLoading: true});
     }
 
     componentDidMount() {
@@ -34,9 +41,13 @@ class App extends Component {
     }
 
     updateGoogleUser(googleUser) {
+        if (this.state.isLoading) {
+            return;
+        }
         this.setState({googleUser: googleUser});
-        this.api = new Api(googleUser.getAuthResponse().id_token, this.props.baseUrl);
-        this.api.getUser((error, result) => {
+        let api = new Api(googleUser.getAuthResponse().id_token, this.props.baseUrl);
+        this.setState({api: api});
+        api.getUser((error, result) => {
             if (error) {
                 console.log(error);
             }
@@ -55,13 +66,13 @@ class App extends Component {
     render() {
         const nodeListProps = {
             nodeUuids: this.state.nodeUuids,
-            api: this.api,
+            api: this.state.api,
             googleUser: this.state.googleUser,
             baseUrl: this.props.baseUrl
         };
 
         const claimProps = {
-            api: this.api,
+            api: this.state.api,
             googleUser: this.state.googleUser,
             baseUrl: this.props.baseUrl
         };
@@ -93,7 +104,7 @@ class App extends Component {
                             <LoginButton googleClientId={Config.google.clientId} updateUserCallback={(googleUser) => {this.updateGoogleUser(googleUser)}}/>
                         </Toolbar>
                     </AppBar>
-                    <Route exact path="/" render={() => <NodeControllerList {...nodeListProps} /> }/>
+                    <Route render={() => <NodeControllerList {...nodeListProps} /> }/>
                     <Route path="/claim/:uuid?" render={(props) => <Claim {...props} {...claimProps} /> }/>
                 </div>
             </BrowserRouter>

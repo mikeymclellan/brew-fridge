@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/mikeymclellan/brew-fridge",
   "dependencies": {
-    "@material-ui/icons": "^1.0.0-beta.42",
-    "aws-sdk": "^2.223.1",
+    "@material-ui/icons": "^1.0.0-beta.43",
+    "aws-sdk": "^2.229.1",
     "dateformat": "^3.0.3",
     "ds18b20": "*",
     "dynamodb": "^1.1.1",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "babel": "*",
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-preset-es2015": "*",
     "babel-preset-react": "*",
@@ -43,16 +43,16 @@
     "jest": "^20.0.4",
     "less": "^2.7.3",
     "less-loader": "^4.1.0",
-    "material-ui": "^1.0.0-beta.41",
+    "material-ui": "^1.0.0-beta.43",
     "popper.js": "^1.14.3",
-    "postcss-loader": "^2.1.3",
-    "react": "^16.3.1",
-    "react-dom": "^16.3.1",
+    "postcss-loader": "^2.1.4",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
     "react-router-dom": "*",
     "style-loader": "^0.17.0",
     "url-loader": "^0.5.9",
-    "webpack": "^4.5.0",
-    "webpack-cli": "^2.0.14",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15",
     "webpack-dev-server": "^3.1.3"
   }
 }

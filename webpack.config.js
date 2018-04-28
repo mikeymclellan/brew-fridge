@@ -14,7 +14,10 @@ module.exports = {
         publicPath: 'build/js/'
     },
     devServer:{
-        contentBase: 'dashboard'
+        contentBase: 'dashboard',
+        historyApiFallback: {
+            index: 'index.html'
+        }
     },
     module: {
         rules: [
